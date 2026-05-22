@@ -1,24 +1,31 @@
 import { useEffect, useState } from 'react';
-// import axios from 'axios';
+import axios from 'axios';
 import * as satellite from 'satellite.js';
 
-const fetchData = async (): Promise<string> => {
-  // const response = await axios
-  //   .get<string>(
-  //     'https://celestrak.org/NORAD/elements/gp.php?CATNR=25544&FORMAT=TLE',
-  //     {
-  //       responseType: 'text',
-  //     }
-  //   )
-  //   .catch((error) => {
-  //     console('Error fetching data:', error);
-  //   });
+type Satellite = {
+  updatedAt: Date;
+  satellites: { name: string; line1: string; line2: string }[];
+};
 
-  const response = `ISS (ZARYA)             
-1 25544U 98067A   26013.40249039  .00009179  00000+0  17283-3 0  9992
-2 25544  51.6332 345.7221 0007762  13.3130 346.8062 15.49273572547762`;
+const fetchData = async (): Promise<Satellite> => {
+  try {
+    const response = await axios.get<Satellite>('http://localhost:5001/iss', {
+      responseType: 'json',
+    });
 
-  return response;
+    return (
+      response?.data ?? {
+        updatedAt: new Date(),
+        satellites: [],
+      }
+    );
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    return {
+      updatedAt: new Date(),
+      satellites: [],
+    };
+  }
 };
 
 const getGeodeticPosition = (line1: string, line2: string, time: Date) => {
@@ -46,22 +53,15 @@ const getGeodeticPosition = (line1: string, line2: string, time: Date) => {
 };
 
 const GetData = () => {
-  type Satellite = string;
-
-  const [data, setData] = useState<Satellite>('');
-  const [fetched, setFetched] = useState(fetchData());
+  const [data, setData] = useState<Satellite>({
+    updatedAt: new Date(),
+    satellites: [],
+  });
+  const [fetched] = useState(fetchData());
   const [geodeticData, setGeodeticData] = useState(
-    getGeodeticPosition('', '', new Date())
+    getGeodeticPosition('', '', new Date()),
   );
   const [position, setPosition] = useState(<></>);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setFetched(() => fetchData());
-    }, 7200000); // Refresh data every 2 hours
-
-    return () => clearInterval(interval);
-  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -70,7 +70,7 @@ const GetData = () => {
           setData(() => response);
         })
         .then(() => {
-          const [name, line1, line2] = data.split('\n');
+          const { name, line1, line2 } = data.satellites[0];
           const id = line1.substring(2, 7).trim();
 
           setGeodeticData(getGeodeticPosition(line1, line2, new Date()));
@@ -95,11 +95,11 @@ const GetData = () => {
                 <h3>Catalog number: {id}</h3>
                 <h3>Position: {positionGeodeticString}</h3>
               </div>
-            </>
+            </>,
           );
         })
         .catch((error) => {
-          console.log('Error getting data:', error);
+          console.log('Error getting data:', data, error);
         });
     }, 1000);
 
