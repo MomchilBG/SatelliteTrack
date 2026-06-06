@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import * as satellite from 'satellite.js';
 
 type Satellite = {
+  positionGeodetic: { longitude: number; latitude: number; height: number };
+  degreesLat: number;
+  degreesLong: number;
+  name: string;
+  id: string;
   updatedAt: Date;
-  satellites: { name: string; line1: string; line2: string }[];
 };
 
 const fetchData = async (): Promise<Satellite> => {
@@ -16,83 +19,65 @@ const fetchData = async (): Promise<Satellite> => {
     return (
       response?.data ?? {
         updatedAt: new Date(),
-        satellites: [],
+        positionGeodetic: { longitude: 0, latitude: 0, height: 0 },
+        degreesLat: 0,
+        degreesLong: 0,
+        name: '',
+        id: '',
       }
     );
   } catch (error) {
     console.error('Error fetching data:', error);
     return {
       updatedAt: new Date(),
-      satellites: [],
+      positionGeodetic: { longitude: 0, latitude: 0, height: 0 },
+      degreesLat: 0,
+      degreesLong: 0,
+      name: '',
+      id: '',
     };
   }
-};
-
-const getGeodeticPosition = (line1: string, line2: string, time: Date) => {
-  const satrec = satellite.twoline2satrec(line1, line2);
-
-  const positionAndVelocity = satellite.propagate(satrec, time);
-
-  if (positionAndVelocity === null) {
-    return 'no longer in orbit';
-  }
-
-  const positionEci = positionAndVelocity.position;
-  const gst = satellite.gstime(time);
-
-  const positionGeodetic = satellite.eciToGeodetic(positionEci!, gst);
-  const radiansLat = positionGeodetic!.latitude;
-  const radiansLong = positionGeodetic!.longitude;
-
-  const [degreesLat, degreesLong] = [
-    satellite.degreesLat(radiansLat),
-    satellite.degreesLong(radiansLong),
-  ];
-
-  return { positionGeodetic, degreesLat, degreesLong };
 };
 
 const GetData = () => {
   const [data, setData] = useState<Satellite>({
     updatedAt: new Date(),
-    satellites: [],
+    positionGeodetic: { longitude: 0, latitude: 0, height: 0 },
+    degreesLat: 0,
+    degreesLong: 0,
+    name: '',
+    id: '',
   });
-  const [fetched] = useState(fetchData());
-  const [geodeticData, setGeodeticData] = useState(
-    getGeodeticPosition('', '', new Date()),
-  );
+  const [fetched, setFetched] = useState(fetchData());
   const [position, setPosition] = useState(<></>);
 
   useEffect(() => {
     const interval = setInterval(() => {
+      setFetched(() => fetchData());
       fetched
         .then((response) => {
           setData(() => response);
+          return response;
         })
-        .then(() => {
-          const { name, line1, line2 } = data.satellites[0];
-          const id = line1.substring(2, 7).trim();
-
-          setGeodeticData(getGeodeticPosition(line1, line2, new Date()));
-
+        .then((response) => {
           const positionGeodeticString =
-            typeof geodeticData === 'string' ? (
-              geodeticData
+            typeof response === 'string' ? (
+              response
             ) : (
               <>
-                <p>Latitude: {geodeticData.degreesLat.toFixed(6)}</p>
-                <p>Longitude: {geodeticData.degreesLong.toFixed(6)}</p>
+                <p>Latitude: {response.degreesLat.toFixed(6)}</p>
+                <p>Longitude: {response.degreesLong.toFixed(6)}</p>
                 <p>
-                  Altitude: {geodeticData.positionGeodetic.height.toFixed(2)} km
+                  Altitude: {response.positionGeodetic.height.toFixed(2)} km
                 </p>
               </>
             );
 
           setPosition(
             <>
-              <div key={id}>
-                <h3>Name: {name}</h3>
-                <h3>Catalog number: {id}</h3>
+              <div key={response.id}>
+                <h3>Name: {response.name}</h3>
+                <h3>Catalog number: {response.id}</h3>
                 <h3>Position: {positionGeodeticString}</h3>
               </div>
             </>,
@@ -104,7 +89,7 @@ const GetData = () => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [fetched, data, geodeticData]);
+  }, [fetched, data]);
 
   return position.props.children ? <>{position}</> : <p>Loading...</p>;
 };
