@@ -1,43 +1,6 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
-
-type Satellite = {
-  positionGeodetic: { longitude: number; latitude: number; height: number };
-  degreesLat: number;
-  degreesLong: number;
-  name: string;
-  id: string;
-  updatedAt: Date;
-};
-
-const fetchData = async (): Promise<Satellite> => {
-  try {
-    const response = await axios.get<Satellite>('http://localhost:5001/iss', {
-      responseType: 'json',
-    });
-
-    return (
-      response?.data ?? {
-        updatedAt: new Date(),
-        positionGeodetic: { longitude: 0, latitude: 0, height: 0 },
-        degreesLat: 0,
-        degreesLong: 0,
-        name: '',
-        id: '',
-      }
-    );
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    return {
-      updatedAt: new Date(),
-      positionGeodetic: { longitude: 0, latitude: 0, height: 0 },
-      degreesLat: 0,
-      degreesLong: 0,
-      name: '',
-      id: '',
-    };
-  }
-};
+import { fetchData } from '../Requests/fetchISS.ts';
+import type { Satellite } from '../Types/satellite.ts';
 
 const GetData = () => {
   const [data, setData] = useState<Satellite>({
