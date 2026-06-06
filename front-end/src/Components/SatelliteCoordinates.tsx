@@ -3,15 +3,9 @@ import { fetchData } from '../Requests/fetchISS.ts';
 import type { Satellite } from '../Types/satellite.ts';
 
 const GetData = () => {
-  const [data, setData] = useState<Satellite>({
-    updatedAt: new Date(),
-    positionGeodetic: { longitude: 0, latitude: 0, height: 0 },
-    degreesLat: 0,
-    degreesLong: 0,
-    name: '',
-    id: '',
-  });
-  const [fetched, setFetched] = useState(fetchData());
+  const [fetched, setFetched] = useState<Promise<Satellite>>(
+    {} as Promise<Satellite>,
+  );
   const [position, setPosition] = useState(<></>);
 
   useEffect(() => {
@@ -19,13 +13,9 @@ const GetData = () => {
       setFetched(() => fetchData());
       fetched
         .then((response) => {
-          setData(() => response);
-          return response;
-        })
-        .then((response) => {
           const positionGeodeticString =
-            typeof response === 'string' ? (
-              response
+            typeof response.positionGeodetic === 'string' ? (
+              response.positionGeodetic
             ) : (
               <>
                 <p>Latitude: {response.degreesLat.toFixed(6)}</p>
@@ -47,12 +37,12 @@ const GetData = () => {
           );
         })
         .catch((error) => {
-          console.log('Error getting data:', data, error);
+          console.log('Error getting data:', error);
         });
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [fetched, data]);
+  }, [fetched]);
 
   return position.props.children ? <>{position}</> : <p>Loading...</p>;
 };
