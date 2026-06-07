@@ -1,5 +1,5 @@
 import './App.css';
-import GetData from './Components/SatelliteCoordinates';
+import GetData from './Components/SatelliteCoordinates/SatelliteCoordinates';
 
 function App() {
   return (
