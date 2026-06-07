@@ -1,0 +1,22 @@
+#map-info {
+  display: flex;
+  flex-direction: column;
+  width: fit-content;
+  justify-content: center;
+  align-items: center;
+  background-color: #3d3d3d;
+}
+
+#data {
+  display: flex;
+  gap: 4rem;
+}
+
+.data-item {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.data-title {
+  font-weight: bold;
+}

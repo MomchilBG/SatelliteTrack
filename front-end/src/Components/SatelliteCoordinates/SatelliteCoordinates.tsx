@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { fetchData } from '../../Requests/fetchISS.ts';
 import type { Satellite } from '../../Types/satellite.ts';
 import LeafletMap from '../LeafletMap/LeafletMap.tsx';
+import './SatelliteCoordinates.css';
 
 const GetData = () => {
   const [fetched, setFetched] = useState<Promise<Satellite> | null>(null);
@@ -38,12 +39,31 @@ const GetData = () => {
     return () => clearInterval(interval);
   }, [fetched]);
   return position.loaded ? (
-    <LeafletMap
-      marker_coords={[
-        +position.positionGeodetic.latitude,
-        +position.positionGeodetic.longitude,
-      ]}
-    />
+    <div id="map-info">
+      <LeafletMap
+        marker_coords={[
+          +position.positionGeodetic.latitude,
+          +position.positionGeodetic.longitude,
+        ]}
+      />
+      <div id="data">
+        <div className="data-item">
+          <p className="data-title">{position.name}</p>
+        </div>
+        <div className="data-item">
+          <p className="data-title">Latitude: </p>
+          <p className="data-value">{position.positionGeodetic.latitude}</p>
+        </div>
+        <div className="data-item">
+          <p className="data-title">Longitude:</p>
+          <p className="data-value"> {position.positionGeodetic.longitude}</p>
+        </div>
+        <div className="data-item">
+          <p className="data-title">Altitude: </p>
+          <p className="data-value">{position.positionGeodetic.altitude}</p>
+        </div>
+      </div>
+    </div>
   ) : (
     <p>Loading...</p>
   );
