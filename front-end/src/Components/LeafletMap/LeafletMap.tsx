@@ -1,14 +1,21 @@
-import { MapContainer, TileLayer, Marker } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Polyline } from 'react-leaflet';
 import type {
   MarkerProps,
   MapContainerProps,
   TileLayerProps,
+  PolylineProps,
 } from 'react-leaflet';
 import { Icon } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './LeafletMap.css';
 
-const LeafletMap = ({ marker_coords }: { marker_coords: [number, number] }) => {
+const LeafletMap = ({
+  marker_coords,
+  path,
+}: {
+  marker_coords: [number, number];
+  path: number[][][];
+}) => {
   const icon = new Icon({
     iconUrl: '../../../img/iss.png',
     iconSize: [40, 40],
@@ -31,10 +38,20 @@ const LeafletMap = ({ marker_coords }: { marker_coords: [number, number] }) => {
       '<a href="https://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank">&copy; <b>Jawg</b>Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
   };
 
+  const polylineProps: PolylineProps[] = path.map((path) => ({
+    positions: path,
+    color: 'blue',
+    weight: 2,
+  }));
+
   return (
     <MapContainer {...mapContainerProps}>
       <TileLayer {...tileLayerProps} />
       {marker_coords && <Marker {...markerProps}></Marker>}
+      {path &&
+        polylineProps.map((props, index) => (
+          <Polyline key={index} {...props} />
+        ))}
     </MapContainer>
   );
 };

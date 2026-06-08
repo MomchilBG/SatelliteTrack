@@ -10,6 +10,7 @@ const GetData = () => {
     name: '0',
     id: '0',
     positionGeodetic: { latitude: '0', longitude: '0', altitude: '0' },
+    path: [[[0, 0]]],
     loaded: false,
   });
 
@@ -27,6 +28,7 @@ const GetData = () => {
                 longitude: response.degreesLong.toFixed(6),
                 altitude: response.positionGeodetic.height.toFixed(2),
               },
+              path: response.path,
               loaded: true,
             });
           })
@@ -45,6 +47,7 @@ const GetData = () => {
           +position.positionGeodetic.latitude,
           +position.positionGeodetic.longitude,
         ]}
+        path={position.path}
       />
       <div id="data">
         <div className="data-item">

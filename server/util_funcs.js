@@ -57,9 +57,15 @@ export const convertTLEtoCoords = (line1, line2, time = new Date()) => {
 
 export const getSatellitePath = (satellite) => {
   const markersCoordinates = [];
+  let coordinatesUpToTheAntimeridian = [];
 
-  for (let markerIndex = 1; markerIndex <= 1080; markerIndex++) {
+  for (let markerIndex = 1; markerIndex <= 1150; markerIndex++) {
     const currentTime = new Date();
+    const prevCoord =
+      coordinatesUpToTheAntimeridian[
+        coordinatesUpToTheAntimeridian.length - 1
+      ] || null;
+
     const { degreesLat, degreesLong } = convertTLEtoCoords(
       satellite.line1,
       satellite.line2,
@@ -68,8 +74,15 @@ export const getSatellitePath = (satellite) => {
       ),
     );
 
-    markersCoordinates.push([degreesLat, degreesLong]);
+    if (prevCoord !== null && prevCoord[1] > degreesLong) {
+      markersCoordinates.push(coordinatesUpToTheAntimeridian);
+      coordinatesUpToTheAntimeridian = [];
+    } else {
+      coordinatesUpToTheAntimeridian.push([degreesLat, degreesLong]);
+    }
   }
+
+  markersCoordinates.push(coordinatesUpToTheAntimeridian);
 
   return markersCoordinates;
 };

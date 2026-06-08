@@ -53,7 +53,7 @@ server.get('/iss', (req, res) => {
 
   res.status(200).json({
     ...ISScoords,
-    ISSpath,
+    path: ISSpath,
     name: response.satellites[0].name,
     id: response.satellites[0].id,
     updatedAt: response.updatedAt,
