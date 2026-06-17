@@ -30,6 +30,12 @@ const LeafletMap = ({
     zoom: 7,
     center: marker_coords,
     scrollWheelZoom: true,
+    worldCopyJump: true,
+    maxBounds: [
+      [-90, -180],
+      [90, 180],
+    ],
+    minZoom: 2,
   };
 
   const tileLayerProps: TileLayerProps = {
