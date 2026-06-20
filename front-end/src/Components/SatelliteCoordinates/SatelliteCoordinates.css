@@ -9,7 +9,17 @@
 
 #data {
   display: flex;
-  gap: 4rem;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
+}
+
+.satellite-info {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  justify-items: center;
 }
 
 .data-item {

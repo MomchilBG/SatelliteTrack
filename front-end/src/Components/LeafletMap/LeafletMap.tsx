@@ -1,34 +1,26 @@
 import { MapContainer, TileLayer, Marker, Polyline } from 'react-leaflet';
-import type {
-  MarkerProps,
-  MapContainerProps,
-  TileLayerProps,
-  PolylineProps,
-} from 'react-leaflet';
+import type { MapContainerProps, TileLayerProps } from 'react-leaflet';
 import { Icon } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './LeafletMap.css';
+import { colors } from '../../constants.ts';
 
 const LeafletMap = ({
-  marker_coords,
-  path,
+  satellites,
 }: {
-  marker_coords: [number, number];
-  path: number[][][];
+  satellites: {
+    marker_coords: [number, number];
+    path: number[][][];
+  }[];
 }) => {
   const icon = new Icon({
     iconUrl: '../../../img/iss.png',
     iconSize: [40, 40],
   });
 
-  const markerProps: MarkerProps = {
-    position: marker_coords,
-    icon: icon,
-  };
-
   const mapContainerProps: MapContainerProps = {
     zoom: 7,
-    center: marker_coords,
+    center: satellites[0]?.marker_coords || [0, 0],
     scrollWheelZoom: true,
     worldCopyJump: true,
     maxBounds: [
@@ -44,20 +36,24 @@ const LeafletMap = ({
       '<a href="https://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank">&copy; <b>Jawg</b>Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
   };
 
-  const polylineProps: PolylineProps[] = path.map((path) => ({
-    positions: path,
-    color: 'blue',
-    weight: 2,
-  }));
-
   return (
     <MapContainer {...mapContainerProps}>
       <TileLayer {...tileLayerProps} />
-      {marker_coords && <Marker {...markerProps}></Marker>}
-      {path &&
-        polylineProps.map((props, index) => (
-          <Polyline key={index} {...props} />
-        ))}
+      {satellites.map((satellite, id: number) => (
+        <>
+          <Marker
+            key={`marker-${id}`}
+            position={satellite.marker_coords}
+            icon={icon}
+          />
+          <Polyline
+            key={`polyline-${id}`}
+            positions={satellite.path}
+            color={`rgb(${colors[id % colors.length]})`}
+            weight={2}
+          />
+        </>
+      ))}
     </MapContainer>
   );
 };
