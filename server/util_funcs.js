@@ -1,3 +1,4 @@
+import { ISS } from './constants';
 import * as satellite from 'satellite.js';
 
 export const splitTLEs = (tles) => {
@@ -37,29 +38,30 @@ export const convertTLEtoCoords = (line1, line2, time = new Date()) => {
 
   const positionAndVelocity = satellite.propagate(satrec, time);
   if (positionAndVelocity === null) {
-    return 'no longer in orbit';
+    return null;
   }
 
   const positionEci = positionAndVelocity.position;
   const gst = satellite.gstime(time);
 
-  const positionGeodetic = satellite.eciToGeodetic(positionEci, gst);
-  const radiansLat = positionGeodetic.latitude;
-  const radiansLong = positionGeodetic.longitude;
+  const { latitude, longitude, height } = satellite.eciToGeodetic(
+    positionEci,
+    gst,
+  );
 
   const [degreesLat, degreesLong] = [
-    satellite.degreesLat(radiansLat),
-    satellite.degreesLong(radiansLong),
+    satellite.degreesLat(latitude),
+    satellite.degreesLong(longitude),
   ];
 
-  return { positionGeodetic, degreesLat, degreesLong };
+  return { height, degreesLat, degreesLong };
 };
 
 export const getSatellitePath = (satellite) => {
   const markersCoordinates = [];
   let coordinatesUpToTheAntimeridian = [];
 
-  for (let markerIndex = 1; markerIndex <= 1150; markerIndex++) {
+  for (let markerIndex = 1; markerIndex <= ISS.ORBIT_POINTS; markerIndex++) {
     const currentTime = new Date();
     const prevCoord =
       coordinatesUpToTheAntimeridian[
@@ -70,7 +72,9 @@ export const getSatellitePath = (satellite) => {
       satellite.line1,
       satellite.line2,
       new Date(
-        currentTime.setSeconds(currentTime.getSeconds() + markerIndex * 5),
+        currentTime.setSeconds(
+          currentTime.getSeconds() + markerIndex * ISS.PERIOD_BETWEEN_POINTS,
+        ),
       ),
     );
 

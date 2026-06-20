@@ -52,11 +52,10 @@ server.get('/iss', (req, res) => {
   const ISSpath = getSatellitePath(response.satellites[0]);
 
   res.status(200).json({
-    ...ISScoords,
-    path: ISSpath,
+    location: ISScoords,
     name: response.satellites[0].name,
     id: response.satellites[0].id,
-    updatedAt: response.updatedAt,
+    path: ISSpath,
   });
 });
 
