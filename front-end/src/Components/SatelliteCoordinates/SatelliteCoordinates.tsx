@@ -6,10 +6,10 @@ import './SatelliteCoordinates.css';
 
 const GetData = () => {
   const [fetched, setFetched] = useState<Promise<Satellite> | null>(null);
-  const [position, setPosition] = useState({
+  const [satelliteInfo, setSatelliteInfo] = useState({
+    location: { latitude: '0', longitude: '0', altitude: '0' },
     name: '0',
     id: '0',
-    positionGeodetic: { latitude: '0', longitude: '0', altitude: '0' },
     path: [[[0, 0]]],
     loaded: false,
   });
@@ -20,13 +20,13 @@ const GetData = () => {
       if (fetched) {
         fetched
           .then((response) => {
-            setPosition({
+            setSatelliteInfo({
               name: response.name,
               id: response.id,
-              positionGeodetic: {
-                latitude: response.degreesLat.toFixed(6),
-                longitude: response.degreesLong.toFixed(6),
-                altitude: response.positionGeodetic.height.toFixed(2),
+              location: {
+                latitude: response.location?.degreesLat.toFixed(6) || '0',
+                longitude: response.location?.degreesLong.toFixed(6) || '0',
+                altitude: response.location?.height.toFixed(2) || '0',
               },
               path: response.path,
               loaded: true,
@@ -40,30 +40,30 @@ const GetData = () => {
 
     return () => clearInterval(interval);
   }, [fetched]);
-  return position.loaded ? (
+  return satelliteInfo.loaded ? (
     <div id="map-info">
       <LeafletMap
         marker_coords={[
-          +position.positionGeodetic.latitude,
-          +position.positionGeodetic.longitude,
+          +satelliteInfo.location?.latitude,
+          +satelliteInfo.location?.longitude,
         ]}
-        path={position.path}
+        path={satelliteInfo.path}
       />
       <div id="data">
         <div className="data-item">
-          <p className="data-title">{position.name}</p>
+          <p className="data-title">{satelliteInfo.name}</p>
         </div>
         <div className="data-item">
           <p className="data-title">Latitude: </p>
-          <p className="data-value">{position.positionGeodetic.latitude}</p>
+          <p className="data-value">{satelliteInfo.location?.latitude}</p>
         </div>
         <div className="data-item">
           <p className="data-title">Longitude:</p>
-          <p className="data-value"> {position.positionGeodetic.longitude}</p>
+          <p className="data-value"> {satelliteInfo.location?.longitude}</p>
         </div>
         <div className="data-item">
           <p className="data-title">Altitude: </p>
-          <p className="data-value">{position.positionGeodetic.altitude}</p>
+          <p className="data-value">{satelliteInfo.location?.altitude} km</p>
         </div>
       </div>
     </div>

@@ -1,9 +1,6 @@
 export type Satellite = {
-  positionGeodetic: { longitude: number; latitude: number; height: number };
-  degreesLat: number;
-  degreesLong: number;
-  path: number[][][];
+  location: { height: number; degreesLat: number; degreesLong: number } | null;
   name: string;
   id: string;
-  updatedAt: Date;
+  path: number[][][];
 };
