@@ -1,5 +1,6 @@
-import { ISS } from './constants';
+import { ISS, NORAD_IDS } from './constants.js';
 import * as satellite from 'satellite.js';
+import { fetchSatelliteTLE } from './requests.js';
 
 export const splitTLEs = (tles) => {
   const splitTLEs = tles.split(/\r?\n/);
@@ -33,6 +34,19 @@ export const setResponse = (response, satellites) => {
   );
 };
 
+export const getData = async (tles, satellites, response) => {
+  try {
+    const requests = Object.values(NORAD_IDS).map((id) =>
+      fetchSatelliteTLE(id),
+    );
+    tles = await Promise.all(requests);
+    satellites = splitTLEs(tles.join(''));
+    setResponse(response, satellites);
+  } catch (e) {
+    console.log('Error fetching data:', e.message);
+  }
+};
+
 export const convertTLEtoCoords = (line1, line2, time = new Date()) => {
   const satrec = satellite.twoline2satrec(line1, line2);
 
@@ -41,11 +55,11 @@ export const convertTLEtoCoords = (line1, line2, time = new Date()) => {
     return null;
   }
 
-  const positionEci = positionAndVelocity.position;
+  const { position, velocity } = positionAndVelocity;
   const gst = satellite.gstime(time);
 
   const { latitude, longitude, height } = satellite.eciToGeodetic(
-    positionEci,
+    position,
     gst,
   );
 
@@ -54,14 +68,19 @@ export const convertTLEtoCoords = (line1, line2, time = new Date()) => {
     satellite.degreesLong(longitude),
   ];
 
-  return { height, degreesLat, degreesLong };
+  return {
+    height,
+    degreesLat,
+    degreesLong,
+    velocity: Math.sqrt(velocity.x ** 2 + velocity.y ** 2 + velocity.z ** 2),
+  };
 };
 
-export const getSatellitePath = (satellite) => {
+export const getSatellitePath = (satellite, orbit_points, period) => {
   const markersCoordinates = [];
   let coordinatesUpToTheAntimeridian = [];
 
-  for (let markerIndex = 1; markerIndex <= ISS.ORBIT_POINTS; markerIndex++) {
+  for (let markerIndex = 1; markerIndex <= orbit_points; markerIndex++) {
     const currentTime = new Date();
     const prevCoord =
       coordinatesUpToTheAntimeridian[
@@ -72,9 +91,7 @@ export const getSatellitePath = (satellite) => {
       satellite.line1,
       satellite.line2,
       new Date(
-        currentTime.setSeconds(
-          currentTime.getSeconds() + markerIndex * ISS.PERIOD_BETWEEN_POINTS,
-        ),
+        currentTime.setSeconds(currentTime.getSeconds() + markerIndex * period),
       ),
     );
 

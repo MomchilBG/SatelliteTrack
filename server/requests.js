@@ -1,10 +1,10 @@
-export const fetchData = async () => {
+export const fetchSatelliteTLE = async (norad_id) => {
   try {
-    const tles = await fetch(
-      'https://celestrak.org/NORAD/elements/gp.php?CATNR=25544&FORMAT=TLE',
+    const tle = await fetch(
+      `https://celestrak.org/NORAD/elements/gp.php?CATNR=${norad_id}&FORMAT=TLE`,
     ).then((res) => res.text());
 
-    return tles;
+    return tle;
   } catch (e) {
     console.log(e.message);
   }
