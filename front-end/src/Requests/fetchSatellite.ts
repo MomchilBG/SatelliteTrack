@@ -1,9 +1,11 @@
 import axios from 'axios';
 import type { Satellite } from '../Types/satellite.ts';
 
-export const fetchData = async (satellite: string): Promise<Satellite> => {
+export const fetchData = async (
+  satellite: string,
+): Promise<Satellite | Satellite[]> => {
   try {
-    const response = await axios.get<Satellite>(
+    const response = await axios.get<Satellite | Satellite[]>(
       `http://localhost:5001/${satellite}`,
       {
         responseType: 'json',

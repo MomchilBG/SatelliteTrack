@@ -6,7 +6,9 @@ import './SatelliteCoordinates.css';
 import { colors } from '../../constants.ts';
 
 const GetData = () => {
-  const [fetched, setFetched] = useState<Promise<Satellite[]> | null>(null);
+  const [fetched, setFetched] = useState<Promise<
+    Satellite | Satellite[]
+  > | null>(null);
   const [satelliteInfo, setSatelliteInfo] = useState([
     {
       location: { latitude: '0', longitude: '0', altitude: '0', velocity: '0' },
@@ -19,23 +21,22 @@ const GetData = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setFetched(() =>
-        Promise.all([fetchData('iss'), fetchData('hubble'), fetchData('css')]),
-      );
+      setFetched(() => fetchData('all'));
       if (fetched) {
         fetched
           .then((response) => {
+            const satellites = Array.isArray(response) ? response : [response];
             setSatelliteInfo(
-              response.map((response) => ({
-                name: response.name,
-                id: response.id,
+              satellites.map((satellite) => ({
+                name: satellite.name,
+                id: satellite.id,
                 location: {
-                  latitude: response.location?.degreesLat.toFixed(6) || '0',
-                  longitude: response.location?.degreesLong.toFixed(6) || '0',
-                  altitude: response.location?.height.toFixed(2) || '0',
-                  velocity: response.location?.velocity.toFixed(2) || '0',
+                  latitude: satellite.location?.degreesLat.toFixed(6) || '0',
+                  longitude: satellite.location?.degreesLong.toFixed(6) || '0',
+                  altitude: satellite.location?.height.toFixed(2) || '0',
+                  velocity: satellite.location?.velocity.toFixed(2) || '0',
                 },
-                path: response.path,
+                path: satellite.path,
                 loaded: true,
               })),
             );
