@@ -1,4 +1,4 @@
-import { ISS, NORAD_IDS } from './constants.js';
+import { NORAD_IDS } from './constants.js';
 import * as satellite from 'satellite.js';
 import { fetchSatelliteTLE } from './requests.js';
 

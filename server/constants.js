@@ -13,8 +13,14 @@ export const CSS = Object.freeze({
   PERIOD_BETWEEN_POINTS: 5,
 });
 
+export const BGS = Object.freeze({
+  ORBIT_POINTS: 200,
+  PERIOD_BETWEEN_POINTS: 5,
+});
+
 export const NORAD_IDS = Object.freeze({
   ISS: 25544,
   HUBBLE: 20580,
   CSS: 48274,
+  BGS: 42801,
 });

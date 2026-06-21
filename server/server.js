@@ -7,7 +7,9 @@ import {
   setResponse,
   getData,
 } from './util_funcs.js';
-import { ISS, CSS, HUBBLE } from './constants.js';
+import { ISS, CSS, HUBBLE, BGS } from './constants.js';
+
+const allSats = [ISS, HUBBLE, CSS, BGS];
 
 const port = 5001;
 const server = express();
@@ -86,6 +88,41 @@ server.get('/css', (req, res) => {
     id: response.satellites[2].id,
     path: CSSpath,
   });
+});
+
+server.get('/bgs', (req, res) => {
+  const BGScoords = convertTLEtoCoords(
+    response.satellites[3].line1,
+    response.satellites[3].line2,
+  );
+
+  const BGSpath = getSatellitePath(
+    response.satellites[3],
+    BGS.ORBIT_POINTS,
+    BGS.PERIOD_BETWEEN_POINTS,
+  );
+
+  res.status(200).json({
+    location: BGScoords,
+    name: response.satellites[3].name,
+    id: response.satellites[3].id,
+    path: BGSpath,
+  });
+});
+
+server.get('/all', (req, res) => {
+  const all = response.satellites.map((sat, id) => ({
+    location: convertTLEtoCoords(sat.line1, sat.line2),
+    name: sat.name,
+    id: sat.id,
+    path: getSatellitePath(
+      sat,
+      allSats[id].ORBIT_POINTS,
+      allSats[id].PERIOD_BETWEEN_POINTS,
+    ),
+  }));
+
+  res.status(200).json(all);
 });
 
 server.listen(port, () => {
