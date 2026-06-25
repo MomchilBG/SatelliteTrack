@@ -7,9 +7,9 @@ import {
   setResponse,
   getData,
 } from './util_funcs.js';
-import { ISS, CSS, HUBBLE, BGS } from './constants.js';
+import { ISS, CSS, HUBBLE, BGS, ACS } from './constants.js';
 
-const allSats = [ISS, HUBBLE, CSS, BGS];
+const allSats = [ISS, HUBBLE, CSS, BGS, ACS];
 
 const port = 5001;
 const server = express();

@@ -95,7 +95,7 @@ export const getSatellitePath = (satellite, orbit_points, period) => {
       ),
     );
 
-    if (prevCoord !== null && prevCoord[1] > degreesLong) {
+    if (prevCoord !== null && prevCoord[1] * degreesLong < 0) {
       markersCoordinates.push(coordinatesUpToTheAntimeridian);
       coordinatesUpToTheAntimeridian = [];
     } else {
