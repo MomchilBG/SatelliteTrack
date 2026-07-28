@@ -7,7 +7,7 @@ import {
   convertTLEtoCoords,
   getSatellitePath,
 } from '../../util_funcs/util_funcs.ts';
-import SatStats from '../SatStats/SatStats.tsx';
+import DetailsPanel from '../DetailsPanel/DetailsPanel.tsx';
 
 const GetData = () => {
   const [fetched, setFetched] = useState<Promise<
@@ -60,23 +60,25 @@ const GetData = () => {
     return () => clearInterval(interval);
   }, [fetched]);
   return satelliteInfo[0]?.loaded ? (
-    <div id="map-info">
-      <LeafletMap
-        satellites={satelliteInfo.map((satellite) => ({
-          marker_coords: [
-            +satellite.location.degreesLat,
-            +satellite.location.degreesLong,
-          ],
-          path: getSatellitePath(
-            satellite.line1,
-            satellite.line2,
-            satellite.ORBIT_POINTS,
-            satellite.PERIOD_BETWEEN_POINTS,
-          ),
-        }))}
-      />
+    <div id="app">
       <div id="data">
-        <SatStats satelliteInfo={satelliteInfo} />
+        <DetailsPanel satelliteInfo={satelliteInfo} />
+      </div>
+      <div id="map-info">
+        <LeafletMap
+          satellites={satelliteInfo.map((satellite) => ({
+            marker_coords: [
+              +satellite.location.degreesLat,
+              +satellite.location.degreesLong,
+            ],
+            path: getSatellitePath(
+              satellite.line1,
+              satellite.line2,
+              satellite.ORBIT_POINTS,
+              satellite.PERIOD_BETWEEN_POINTS,
+            ),
+          }))}
+        />
       </div>
     </div>
   ) : (
