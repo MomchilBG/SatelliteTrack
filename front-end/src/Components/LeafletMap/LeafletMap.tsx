@@ -4,6 +4,7 @@ import { Icon } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './LeafletMap.css';
 import { colors } from '../../constants.ts';
+import { useMemo } from 'react';
 
 const LeafletMap = ({
   satellites,
@@ -18,23 +19,29 @@ const LeafletMap = ({
     iconSize: [40, 40],
   });
 
-  const mapContainerProps: MapContainerProps = {
-    zoom: 7,
-    center: satellites[0]?.marker_coords || [0, 0],
-    scrollWheelZoom: true,
-    worldCopyJump: true,
-    maxBounds: [
-      [-90, -180],
-      [90, 180],
-    ],
-    minZoom: 2,
-  };
+  const mapContainerProps: MapContainerProps = useMemo(
+    () => ({
+      zoom: 2,
+      center: [0, 0],
+      scrollWheelZoom: true,
+      worldCopyJump: true,
+      maxBounds: [
+        [-90, -180],
+        [90, 180],
+      ],
+      minZoom: 2,
+    }),
+    [],
+  );
 
-  const tileLayerProps: TileLayerProps = {
-    url: 'https://{s}.tile.jawg.io/jawg-streets/{z}/{x}/{y}{r}.png?access-token=hHud8GDOi5a4Brzsy6hsVNp5CRyQRBREBCuYoVepy0hZRow9gORVtK5bw9Fb21jV',
-    attribution:
-      '<a href="https://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank">&copy; <b>Jawg</b>Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-  };
+  const tileLayerProps: TileLayerProps = useMemo(
+    () => ({
+      url: 'https://{s}.tile.jawg.io/jawg-streets/{z}/{x}/{y}{r}.png?access-token=hHud8GDOi5a4Brzsy6hsVNp5CRyQRBREBCuYoVepy0hZRow9gORVtK5bw9Fb21jV',
+      attribution:
+        '<a href="https://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank">&copy; <b>Jawg</b>Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }),
+    [],
+  );
 
   return (
     <MapContainer {...mapContainerProps}>

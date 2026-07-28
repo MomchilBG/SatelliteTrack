@@ -14,19 +14,23 @@ export const fetchData = async (
 
     return (
       response?.data ?? {
-        location: { degreesLong: 0, degreesLat: 0, height: 0, velocity: 0 },
+        line1: '',
+        line2: '',
         name: '',
         id: '',
-        path: [[[0, 0]]],
+        ORBIT_POINTS: 0,
+        PERIOD_BETWEEN_POINTS: 0,
       }
     );
   } catch (error) {
     console.error('Error fetching data:', error);
     return {
-      location: { degreesLong: 0, degreesLat: 0, height: 0, velocity: 0 },
+      line1: '',
+      line2: '',
       name: '',
       id: '',
-      path: [[[0, 0]]],
+      ORBIT_POINTS: 0,
+      PERIOD_BETWEEN_POINTS: 0,
     };
   }
 };

@@ -4,6 +4,10 @@ import type { Satellite } from '../../Types/satellite.ts';
 import LeafletMap from '../LeafletMap/LeafletMap.tsx';
 import './SatelliteCoordinates.css';
 import { colors } from '../../constants.ts';
+import {
+  convertTLEtoCoords,
+  getSatellitePath,
+} from '../../util_funcs/util_funcs.ts';
 
 const GetData = () => {
   const [fetched, setFetched] = useState<Promise<
@@ -11,10 +15,18 @@ const GetData = () => {
   > | null>(null);
   const [satelliteInfo, setSatelliteInfo] = useState([
     {
-      location: { latitude: '0', longitude: '0', altitude: '0', velocity: '0' },
+      line1: '',
+      line2: '',
       name: '0',
       id: '0',
-      path: [[[0, 0]]],
+      ORBIT_POINTS: 0,
+      PERIOD_BETWEEN_POINTS: 0,
+      location: {
+        height: -1,
+        degreesLat: 0,
+        degreesLong: 0,
+        velocity: 0,
+      },
       loaded: false,
     },
   ]);
@@ -28,15 +40,13 @@ const GetData = () => {
             const satellites = Array.isArray(response) ? response : [response];
             setSatelliteInfo(
               satellites.map((satellite) => ({
+                line1: satellite.line1,
+                line2: satellite.line2,
                 name: satellite.name,
                 id: satellite.id,
-                location: {
-                  latitude: satellite.location?.degreesLat.toFixed(6) || '0',
-                  longitude: satellite.location?.degreesLong.toFixed(6) || '0',
-                  altitude: satellite.location?.height.toFixed(2) || '0',
-                  velocity: satellite.location?.velocity.toFixed(2) || '0',
-                },
-                path: satellite.path,
+                ORBIT_POINTS: satellite.ORBIT_POINTS,
+                PERIOD_BETWEEN_POINTS: satellite.PERIOD_BETWEEN_POINTS,
+                location: convertTLEtoCoords(satellite.line1, satellite.line2),
                 loaded: true,
               })),
             );
@@ -54,10 +64,15 @@ const GetData = () => {
       <LeafletMap
         satellites={satelliteInfo.map((satellite) => ({
           marker_coords: [
-            +satellite.location.latitude,
-            +satellite.location.longitude,
+            +satellite.location.degreesLat,
+            +satellite.location.degreesLong,
           ],
-          path: satellite.path,
+          path: getSatellitePath(
+            satellite.line1,
+            satellite.line2,
+            satellite.ORBIT_POINTS,
+            satellite.PERIOD_BETWEEN_POINTS,
+          ),
         }))}
       />
       <div id="data">
@@ -74,19 +89,28 @@ const GetData = () => {
             </div>
             <div className="data-item">
               <p className="data-title">Latitude: </p>
-              <p className="data-value">{satellite.location?.latitude}</p>
+              <p className="data-value">
+                {satellite.location?.degreesLat.toFixed(2)}
+              </p>
             </div>
             <div className="data-item">
               <p className="data-title">Longitude:</p>
-              <p className="data-value"> {satellite.location?.longitude}</p>
+              <p className="data-value">
+                {' '}
+                {satellite.location?.degreesLong.toFixed(2)}
+              </p>
             </div>
             <div className="data-item">
               <p className="data-title">Altitude: </p>
-              <p className="data-value">{satellite.location?.altitude}km</p>
+              <p className="data-value">
+                {satellite.location?.height.toFixed(2)}km
+              </p>
             </div>
             <div className="data-item">
               <p className="data-title">Velocity: </p>
-              <p className="data-value">{satellite.location?.velocity}km/s</p>
+              <p className="data-value">
+                {satellite.location?.velocity.toFixed(2)}km/s
+              </p>
             </div>
           </div>
         ))}
