@@ -30,6 +30,7 @@ const LeafletMap = ({
         [90, 180],
       ],
       minZoom: 2,
+      preferCanvas: true,
     }),
     [],
   );
