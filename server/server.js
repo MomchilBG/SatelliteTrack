@@ -22,7 +22,7 @@ let [tles, satellites, response] = [
 getData(tles, satellites, response);
 
 //Update TLE data every 2 hours
-setInterval(getData, 7200000);
+setInterval(() => getData(tles, satellites, response), 7200000);
 
 server.get('/iss', (req, res) => {
   res.status(200).json({
@@ -53,14 +53,12 @@ server.get('/bgs', (req, res) => {
 });
 
 server.get('/all', (req, res) => {
-  res
-    .status(200)
-    .json(
-      response.satellites.map((satellite, i) => ({
-        ...satellite,
-        ...allSats[i],
-      })),
-    );
+  res.status(200).json(
+    response.satellites.map((satellite, i) => ({
+      ...satellite,
+      ...allSats[i],
+    })),
+  );
 });
 
 server.listen(port, () => {
