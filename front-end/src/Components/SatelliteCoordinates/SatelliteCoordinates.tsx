@@ -3,11 +3,11 @@ import { fetchData } from '../../Requests/fetchSatellite.ts';
 import type { Satellite } from '../../Types/satellite.ts';
 import LeafletMap from '../LeafletMap/LeafletMap.tsx';
 import './SatelliteCoordinates.css';
-import { colors } from '../../constants.ts';
 import {
   convertTLEtoCoords,
   getSatellitePath,
 } from '../../util_funcs/util_funcs.ts';
+import SatStats from '../SatStats/SatStats.tsx';
 
 const GetData = () => {
   const [fetched, setFetched] = useState<Promise<
@@ -76,44 +76,7 @@ const GetData = () => {
         }))}
       />
       <div id="data">
-        {satelliteInfo.map((satellite, id) => (
-          <div
-            key={`satellite-info-${id}`}
-            className="satellite-info "
-            style={{
-              backgroundColor: `rgba(${colors[id % colors.length]}, 0.35)`,
-            }}
-          >
-            <div className="data-item">
-              <p className="data-title">{satellite.name}</p>
-            </div>
-            <div className="data-item">
-              <p className="data-title">Latitude: </p>
-              <p className="data-value">
-                {satellite.location?.degreesLat.toFixed(2)}
-              </p>
-            </div>
-            <div className="data-item">
-              <p className="data-title">Longitude:</p>
-              <p className="data-value">
-                {' '}
-                {satellite.location?.degreesLong.toFixed(2)}
-              </p>
-            </div>
-            <div className="data-item">
-              <p className="data-title">Altitude: </p>
-              <p className="data-value">
-                {satellite.location?.height.toFixed(2)}km
-              </p>
-            </div>
-            <div className="data-item">
-              <p className="data-title">Velocity: </p>
-              <p className="data-value">
-                {satellite.location?.velocity.toFixed(2)}km/s
-              </p>
-            </div>
-          </div>
-        ))}
+        <SatStats satelliteInfo={satelliteInfo} />
       </div>
     </div>
   ) : (
