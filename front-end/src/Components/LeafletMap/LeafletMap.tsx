@@ -4,7 +4,8 @@ import { Icon } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './LeafletMap.css';
 import { colors } from '../../constants.ts';
-import { useMemo } from 'react';
+import { Fragment, useMemo } from 'react';
+import satelliteIcon from '../../../img/iss.png';
 
 const LeafletMap = ({
   satellites,
@@ -14,10 +15,14 @@ const LeafletMap = ({
     path: number[][][];
   }[];
 }) => {
-  const icon = new Icon({
-    iconUrl: '../../../img/iss.png',
-    iconSize: [40, 40],
-  });
+  const icon = useMemo(
+    () =>
+      new Icon({
+        iconUrl: satelliteIcon,
+        iconSize: [40, 40],
+      }),
+    [],
+  );
 
   const mapContainerProps: MapContainerProps = useMemo(
     () => ({
@@ -46,9 +51,9 @@ const LeafletMap = ({
 
   return (
     <MapContainer {...mapContainerProps}>
-      <TileLayer {...tileLayerProps} />
+      <TileLayer key="tileLayer" {...tileLayerProps} />
       {satellites.map((satellite, id: number) => (
-        <>
+        <Fragment key={`frag-${id}`}>
           <Marker
             key={`marker-${id}`}
             position={satellite.marker_coords}
@@ -56,11 +61,12 @@ const LeafletMap = ({
           />
           <Polyline
             key={`polyline-${id}`}
+            // @ts-expect-error uwu
             positions={satellite.path}
             color={`rgb(${colors[id % colors.length]})`}
             weight={2}
           />
-        </>
+        </Fragment>
       ))}
     </MapContainer>
   );
