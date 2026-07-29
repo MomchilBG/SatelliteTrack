@@ -60,7 +60,11 @@ export const getSatellitePath = (
       ),
     );
 
-    if (prevCoord !== null && prevCoord[1] * degreesLong < 0) {
+    if (
+      prevCoord !== null &&
+      prevCoord[1] * degreesLong < 0 &&
+      Math.abs(prevCoord[1]) > 90
+    ) {
       markersCoordinates.push(coordinatesUpToTheAntimeridian);
       coordinatesUpToTheAntimeridian = [];
     } else {
