@@ -3,3 +3,7 @@
   width: 60rem;
   margin: 0 auto;
 }
+
+.leaflet-container:focus {
+  outline: none;
+}

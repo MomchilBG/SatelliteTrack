@@ -52,6 +52,7 @@ const GetData = () => {
 
     return () => clearInterval(interval);
   }, []);
+
   return satelliteInfo[0]?.loaded ? (
     <div id="app">
       <div id="data">
