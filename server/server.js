@@ -1,9 +1,9 @@
 import express from 'express';
 import cors from 'cors';
 import { getData } from './util_funcs.js';
-import { ISS, CSS, HUBBLE, BGS, ACS } from './constants.js';
+import { ISS, CSS, HUBBLE } from './constants.js';
 
-const allSats = [ISS, HUBBLE, CSS, BGS, ACS];
+const allSats = [ISS, HUBBLE, CSS];
 
 const port = 5001;
 const server = express();
@@ -42,13 +42,6 @@ server.get('/css', (req, res) => {
   res.status(200).json({
     ...response.satellites[2],
     ...CSS,
-  });
-});
-
-server.get('/bgs', (req, res) => {
-  res.status(200).json({
-    ...response.satellites[3],
-    ...BGS,
   });
 });
 
