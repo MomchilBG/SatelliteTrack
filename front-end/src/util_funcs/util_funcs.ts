@@ -42,7 +42,7 @@ export const getSatellitePath = (
   const markersCoordinates = [];
   let coordinatesUpToTheAntimeridian = [];
 
-  for (let markerIndex = 1; markerIndex <= orbit_points; markerIndex++) {
+  for (let markerIndex = 0; markerIndex <= orbit_points; markerIndex++) {
     const currentTime = new Date();
     const prevCoord =
       coordinatesUpToTheAntimeridian[

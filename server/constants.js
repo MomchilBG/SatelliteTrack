@@ -5,16 +5,16 @@ export const NORAD_IDS = Object.freeze({
 });
 
 export const ISS = Object.freeze({
-  ORBIT_POINTS: 380,
+  ORBIT_POINTS: 387,
   PERIOD_BETWEEN_POINTS: 15,
 });
 
 export const HUBBLE = Object.freeze({
-  ORBIT_POINTS: 400,
+  ORBIT_POINTS: 398,
   PERIOD_BETWEEN_POINTS: 15,
 });
 
 export const CSS = Object.freeze({
-  ORBIT_POINTS: 380,
+  ORBIT_POINTS: 393,
   PERIOD_BETWEEN_POINTS: 15,
 });
