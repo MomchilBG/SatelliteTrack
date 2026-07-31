@@ -1,12 +1,23 @@
 #root {
   display: flex;
+  flex-direction: column;
   justify-content: center;
-  margin-top: 15vh;
-  width: 100%;
+  width: 80vw;
   text-align: center;
+  gap: 4rem;
+  margin: 0 auto;
+  padding: 15vh 0;
+}
+
+#panels-container {
+  display: grid;
+  grid-template-columns: auto;
+  background-color: darkslategray;
+  border: 3px solid gray;
 }
 
 body {
+  background-image: url('../img/space.png');
   margin: 0;
 }
 

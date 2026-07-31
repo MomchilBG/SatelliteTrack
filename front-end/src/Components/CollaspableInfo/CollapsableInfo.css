@@ -1,0 +1,22 @@
+.collapsable-info {
+  width: 100%;
+  text-align: center;
+  font-weight: bold;
+  background-color: #353535;
+  border: none;
+  color: white;
+  padding: 0.5rem;
+  position: relative;
+}
+
+.collapsable-info:hover:after {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  cursor: pointer;
+  background-color: #ffffff3c;
+}

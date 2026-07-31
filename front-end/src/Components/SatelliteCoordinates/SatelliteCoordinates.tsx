@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { fetchData } from '../../Requests/fetchSatellite.ts';
 import LeafletMap from '../LeafletMap/LeafletMap.tsx';
 import './SatelliteCoordinates.css';
@@ -6,7 +6,8 @@ import {
   convertTLEtoCoords,
   getSatellitePath,
 } from '../../util_funcs/util_funcs.ts';
-import DetailsPanel from '../DetailsPanel/DetailsPanel.tsx';
+import CollapsableInfo from '../CollaspableInfo/CollapsableInfo.tsx';
+import TrackingInfoPanel from '../TrackingInfoPanel/TrackingInfoPanel.tsx';
 
 const GetData = () => {
   const [satelliteInfo, setSatelliteInfo] = useState([
@@ -26,6 +27,7 @@ const GetData = () => {
       loaded: false,
     },
   ]);
+  const [display, setDisplay] = useState({ 0: 'none', 1: 'none', 2: 'none' });
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -53,10 +55,31 @@ const GetData = () => {
     return () => clearInterval(interval);
   }, []);
 
+  const expandInfo = useMemo(
+    () => (id: number) => {
+      const copy = { ...display };
+      copy[id as keyof typeof copy] =
+        copy[id as keyof typeof copy] === 'none' ? 'block' : 'none';
+      setDisplay({ ...copy });
+    },
+    [display],
+  );
+
   return satelliteInfo[0]?.loaded ? (
     <div id="app">
       <div id="data">
-        <DetailsPanel satelliteInfo={satelliteInfo} />
+        {satelliteInfo.map((satellite, i) => (
+          <CollapsableInfo
+            key={i}
+            title={satellite.name}
+            props={{ satellite: satellite }}
+            // @ts-expect-error uwu
+            Comp={TrackingInfoPanel}
+            id={i}
+            onClick={expandInfo}
+            display={display[i as keyof typeof display]}
+          />
+        ))}
       </div>
       <div id="map-info">
         <LeafletMap
