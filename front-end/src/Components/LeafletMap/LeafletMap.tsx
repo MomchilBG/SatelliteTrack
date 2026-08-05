@@ -3,7 +3,7 @@ import type { MapContainerProps, TileLayerProps } from 'react-leaflet';
 import { Icon } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './LeafletMap.css';
-import { colors } from '../../constants.ts';
+import { colors } from '../../constants.tsx';
 import { Fragment, useMemo } from 'react';
 import satelliteIcon from '../../../img/iss.png';
 

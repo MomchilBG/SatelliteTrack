@@ -1,5 +1,5 @@
 import type { SatelliteInfo } from '../../Types/satellite.ts';
-import { colors } from '../../constants.ts';
+import { colors } from '../../constants.tsx';
 import './CollapsableInfo.css';
 import React from 'react';
 

@@ -25,6 +25,7 @@ body {
   flex-direction: row;
   width: 100%;
   border: 3px solid gray;
+  transition: background-color 0.5s;
 }
 
 #info-panel-nav-bar {

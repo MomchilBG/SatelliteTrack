@@ -1,11 +1,17 @@
 import './App.css';
-import { aboutCSS, aboutHST, aboutISS } from './constants.ts';
+import {
+  aboutCSS,
+  aboutHST,
+  aboutISS,
+  aboutProject,
+  aboutMe,
+} from './constants.tsx';
 import GetData from './Components/SatelliteCoordinates/SatelliteCoordinates.tsx';
 import { useMemo, useState } from 'react';
-import { colors } from './constants.ts';
+import { colors } from './constants.tsx';
 import type { AboutInfo } from './Types/about_info.ts';
 
-const satsGenInfo = [aboutISS, aboutHST, aboutCSS];
+const satsGenInfo = [aboutISS, aboutHST, aboutCSS, aboutProject, aboutMe];
 
 function App() {
   const [openedPanel, setOpenedPanel] = useState({
