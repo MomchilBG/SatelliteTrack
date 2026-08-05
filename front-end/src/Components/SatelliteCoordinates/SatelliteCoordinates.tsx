@@ -73,7 +73,6 @@ const GetData = () => {
             key={i}
             title={satellite.name}
             props={{ satellite: satellite }}
-            // @ts-expect-error uwu
             Comp={TrackingInfoPanel}
             id={i}
             onClick={expandInfo}

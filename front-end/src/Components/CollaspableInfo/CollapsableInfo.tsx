@@ -12,14 +12,13 @@ const CollapsableInfo = ({
   display,
 }: {
   title: string;
-  props:
-    | { satellite: SatelliteInfo }
-    | { info: { name: string; about: string } };
+  props: { satellite: SatelliteInfo };
   id: number;
-  Comp: React.ComponentType<
-    | { satellite: SatelliteInfo; id: number; display: string }
-    | { info: { name: string; about: string }; id: number; display: string }
-  >;
+  Comp: React.ComponentType<{
+    satellite: SatelliteInfo;
+    id: number;
+    display: string;
+  }>;
   onClick: (id: number) => void;
   display: string;
 }) => {

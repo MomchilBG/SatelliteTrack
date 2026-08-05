@@ -1,52 +1,44 @@
 import './App.css';
 import { aboutCSS, aboutHST, aboutISS } from './constants.ts';
 import GetData from './Components/SatelliteCoordinates/SatelliteCoordinates.tsx';
-import GeneralInfoPanel from './Components/GeneralInfoPanel/GeneralInfoPanel.tsx';
-import CollapsableInfo from './Components/CollaspableInfo/CollapsableInfo.tsx';
 import { useMemo, useState } from 'react';
+import { colors } from './constants.ts';
 
 const satsGenInfo = [aboutISS, aboutHST, aboutCSS];
 
 function App() {
-  const [openedPanels, setOpenedPanels] = useState({
-    0: 'block',
-    1: 'none',
-    2: 'none',
-  });
+  const [openedPanel, setOpenedPanel] = useState({ info: aboutISS, id: 0 });
 
-  const toggleInfo = useMemo(
-    () => (id: number) => {
-      const copy = { ...openedPanels };
-
-      for (const panel in openedPanels) {
-        // @ts-expect-error uwu
-        copy[panel as keyof typeof copy] = 'none';
-      }
-      copy[id as keyof typeof copy] = 'block';
-
-      setOpenedPanels({
-        ...copy,
-      });
+  const navBarOnClick = useMemo(
+    () => (info: { name: string; about: string }, id: number) => {
+      setOpenedPanel({ info: info, id: id });
     },
-    [openedPanels],
+    [],
   );
 
   return (
     <>
       <GetData />
-      <div id="panels-container">
-        {satsGenInfo.map((info, i) => (
-          <CollapsableInfo
-            key={`genInfo${i}`}
-            title={info.name}
-            props={{ info: info }}
-            id={i}
-            // @ts-expect-error uwu
-            Comp={GeneralInfoPanel}
-            onClick={toggleInfo}
-            display={openedPanels[i as keyof typeof openedPanels]}
-          />
-        ))}
+      <div
+        id="panels-container"
+        style={{
+          backgroundColor: `rgba(${colors[openedPanel.id % colors.length]}, 0.35)`,
+        }}
+      >
+        <div id="info-panel-nav-bar">
+          {satsGenInfo.map((info, i) => (
+            <button
+              className="nav-bar-section"
+              onClick={() => navBarOnClick(info, i)}
+              style={{
+                backgroundColor: `rgba(${colors[i % colors.length]}, 0.45)`,
+              }}
+            >
+              {info.name}
+            </button>
+          ))}
+        </div>
+        <p className="info-container">{openedPanel.info.about}</p>
       </div>
     </>
   );
