@@ -26,4 +26,5 @@
   height: 64vh;
   max-height: 64vh;
   overflow-y: scroll;
+  overscroll-behavior-y: none;
 }
