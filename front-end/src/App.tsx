@@ -3,14 +3,18 @@ import { aboutCSS, aboutHST, aboutISS } from './constants.ts';
 import GetData from './Components/SatelliteCoordinates/SatelliteCoordinates.tsx';
 import { useMemo, useState } from 'react';
 import { colors } from './constants.ts';
+import type { AboutInfo } from './Types/about_info.ts';
 
 const satsGenInfo = [aboutISS, aboutHST, aboutCSS];
 
 function App() {
-  const [openedPanel, setOpenedPanel] = useState({ info: aboutISS, id: 0 });
+  const [openedPanel, setOpenedPanel] = useState({
+    info: { ...aboutISS },
+    id: 0,
+  });
 
   const navBarOnClick = useMemo(
-    () => (info: { name: string; about: string }, id: number) => {
+    () => (info: AboutInfo, id: number) => {
       setOpenedPanel({ info: info, id: id });
     },
     [],

@@ -4,7 +4,7 @@
   justify-items: left;
   padding-left: 1.5rem;
   box-sizing: border-box;
-  margin-top: -0.5rem;
+  margin-top: -0.8rem;
 }
 
 .data-item {
@@ -14,8 +14,13 @@
 
 .data-item > p {
   margin: 0.5rem 0;
+  font-size: 17px;
 }
 
 .data-title {
-  font-weight: bold;
+  font-weight: 600;
+}
+
+.data-value {
+  font-weight: 400;
 }
