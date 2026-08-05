@@ -63,7 +63,7 @@ body {
   background-color: #ffffff3c;
 }
 
-.info-container {
+#info-container {
   overscroll-behavior-y: none;
   font-family: monospace;
   padding: 1.5rem;

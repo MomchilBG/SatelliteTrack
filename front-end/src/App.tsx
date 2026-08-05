@@ -15,6 +15,10 @@ function App() {
 
   const navBarOnClick = useMemo(
     () => (info: AboutInfo, id: number) => {
+      // Set the info container to be in its most scrolled-up position
+      const infoContainer = document.querySelector('#info-container');
+      if (infoContainer) infoContainer.scrollTop = 0;
+
       setOpenedPanel({ info: info, id: id });
     },
     [],
@@ -42,7 +46,7 @@ function App() {
             </button>
           ))}
         </div>
-        <p className="info-container">{openedPanel.info.about}</p>
+        <p id="info-container">{openedPanel.info.about}</p>
       </div>
     </>
   );
