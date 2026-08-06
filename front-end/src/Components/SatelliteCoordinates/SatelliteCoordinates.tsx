@@ -8,8 +8,9 @@ import {
 } from '../../util_funcs/util_funcs.ts';
 import CollapsableInfo from '../CollaspableInfo/CollapsableInfo.tsx';
 import TrackingInfoPanel from '../TrackingInfoPanel/TrackingInfoPanel.tsx';
+import type { Satellite } from '../../Types/satellite.ts';
 
-const initialFetch = await fetchData('all')
+const initialFetch: Satellite[] = await fetchData('all')
   .then((response) => (Array.isArray(response) ? response : [response]))
   .catch((error) => {
     console.log(error);
@@ -21,7 +22,6 @@ const initialFetch = await fetchData('all')
         id: '',
         ORBIT_POINTS: 0,
         PERIOD_BETWEEN_POINTS: 0,
-        loaded: false,
       },
     ];
   });
@@ -35,7 +35,7 @@ const GetData = () => {
       id: TLE.id,
       ORBIT_POINTS: TLE.ORBIT_POINTS,
       PERIOD_BETWEEN_POINTS: TLE.PERIOD_BETWEEN_POINTS,
-      loaded: true,
+      loaded: TLE.line1 === '' ? false : true,
     })),
   );
   const [locations, setLocations] = useState(
