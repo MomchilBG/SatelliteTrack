@@ -42,6 +42,7 @@ function App() {
         <div id="info-panel-nav-bar">
           {satsGenInfo.map((info, i) => (
             <button
+              key={`${info.name}-btn`}
               className="nav-bar-section"
               onClick={() => navBarOnClick(info, i)}
               style={{
