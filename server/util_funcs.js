@@ -29,7 +29,9 @@ const setResponse = (response, satellites) => {
           .map((line) => line.join(': '))
           .join('\n'),
       )
-      .join('\n\n')}\n\nTLE updated at: ${response.updatedAt}`,
+      .join(
+        '\n\n',
+      )}\n\nTLE updated at: ${response.updatedAt}\n----------------------------------------------------------------------------\n\n`,
   );
 };
 
