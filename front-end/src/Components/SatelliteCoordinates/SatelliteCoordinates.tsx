@@ -9,25 +9,26 @@ import {
 import CollapsableInfo from '../CollaspableInfo/CollapsableInfo.tsx';
 import TrackingInfoPanel from '../TrackingInfoPanel/TrackingInfoPanel.tsx';
 
-const initialFetch = await fetchData('all').catch((error) => {
-  console.log(error);
-  return [
-    {
-      line1: '',
-      line2: '',
-      name: '',
-      id: '',
-      ORBIT_POINTS: 0,
-      PERIOD_BETWEEN_POINTS: 0,
-      loaded: false,
-    },
-  ];
-});
-const initialTLEs = Array.isArray(initialFetch) ? initialFetch : [initialFetch];
+const initialFetch = await fetchData('all')
+  .then((response) => (Array.isArray(response) ? response : [response]))
+  .catch((error) => {
+    console.log(error);
+    return [
+      {
+        line1: '',
+        line2: '',
+        name: '',
+        id: '',
+        ORBIT_POINTS: 0,
+        PERIOD_BETWEEN_POINTS: 0,
+        loaded: false,
+      },
+    ];
+  });
 
 const GetData = () => {
   const [TLEs, setTLEs] = useState(
-    initialTLEs.map((TLE) => ({
+    initialFetch.map((TLE) => ({
       line1: TLE.line1,
       line2: TLE.line2,
       name: TLE.name,
