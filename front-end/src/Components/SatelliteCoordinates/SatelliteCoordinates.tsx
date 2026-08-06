@@ -9,40 +9,67 @@ import {
 import CollapsableInfo from '../CollaspableInfo/CollapsableInfo.tsx';
 import TrackingInfoPanel from '../TrackingInfoPanel/TrackingInfoPanel.tsx';
 
-const GetData = () => {
-  const [satelliteInfo, setSatelliteInfo] = useState([
+const initialFetch = await fetchData('all').catch((error) => {
+  console.log(error);
+  return [
     {
       line1: '',
       line2: '',
-      name: '0',
-      id: '0',
+      name: '',
+      id: '',
       ORBIT_POINTS: 0,
       PERIOD_BETWEEN_POINTS: 0,
-      location: {
-        height: -1,
-        degreesLat: 0,
-        degreesLong: 0,
-        velocity: 0,
-      },
       loaded: false,
     },
-  ]);
+  ];
+});
+const initialTLEs = Array.isArray(initialFetch) ? initialFetch : [initialFetch];
+
+const GetData = () => {
+  const [TLEs, setTLEs] = useState(
+    initialTLEs.map((TLE) => ({
+      line1: TLE.line1,
+      line2: TLE.line2,
+      name: TLE.name,
+      id: TLE.id,
+      ORBIT_POINTS: TLE.ORBIT_POINTS,
+      PERIOD_BETWEEN_POINTS: TLE.PERIOD_BETWEEN_POINTS,
+      loaded: true,
+    })),
+  );
+  const [locations, setLocations] = useState(
+    TLEs[0].loaded
+      ? TLEs.map((TLE) => ({
+          location: convertTLEtoCoords(TLE.line1, TLE.line2),
+          loaded: true,
+        }))
+      : [
+          {
+            location: {
+              height: -1,
+              degreesLat: 0,
+              degreesLong: 0,
+              velocity: 0,
+            },
+            loaded: false,
+          },
+        ],
+  );
   const [display, setDisplay] = useState({ 0: 'none', 1: 'none', 2: 'none' });
 
   useEffect(() => {
     const interval = setInterval(() => {
       fetchData('all')
         .then((response) => {
-          const satellites = Array.isArray(response) ? response : [response];
-          setSatelliteInfo(
-            satellites.map((satellite) => ({
-              line1: satellite.line1,
-              line2: satellite.line2,
-              name: satellite.name,
-              id: satellite.id,
-              ORBIT_POINTS: satellite.ORBIT_POINTS,
-              PERIOD_BETWEEN_POINTS: satellite.PERIOD_BETWEEN_POINTS,
-              location: convertTLEtoCoords(satellite.line1, satellite.line2),
+          const fetchedTLEs = Array.isArray(response) ? response : [response];
+          setTLEs(
+            fetchedTLEs.map((TLE) => ({
+              line1: TLE.line1,
+              line2: TLE.line2,
+              name: TLE.name,
+              id: TLE.id,
+              ORBIT_POINTS: TLE.ORBIT_POINTS,
+              PERIOD_BETWEEN_POINTS: TLE.PERIOD_BETWEEN_POINTS,
               loaded: true,
             })),
           );
@@ -50,10 +77,24 @@ const GetData = () => {
         .catch((error) => {
           console.log('Error getting data:', error);
         });
-    }, 1000);
+    }, 20000);
 
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (TLEs[0].loaded) {
+        setLocations(
+          TLEs.map((TLE) => ({
+            location: convertTLEtoCoords(TLE.line1, TLE.line2),
+            loaded: true,
+          })),
+        );
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [TLEs]);
 
   const expandInfo = useMemo(
     () => (id: number) => {
@@ -65,14 +106,14 @@ const GetData = () => {
     [display],
   );
 
-  return satelliteInfo[0]?.loaded ? (
+  return TLEs[0].loaded && locations[0].loaded ? (
     <div id="app">
       <div id="data">
-        {satelliteInfo.map((satellite, i) => (
+        {TLEs.map((satellite, i) => (
           <CollapsableInfo
             key={i}
             title={satellite.name}
-            props={{ satellite: satellite }}
+            props={{ satellite: { ...satellite, ...locations[i] } }}
             Comp={TrackingInfoPanel}
             id={i}
             onClick={expandInfo}
@@ -82,10 +123,10 @@ const GetData = () => {
       </div>
       <div id="map-info">
         <LeafletMap
-          satellites={satelliteInfo.map((satellite) => ({
+          satellites={TLEs.map((satellite, i) => ({
             marker_coords: [
-              +satellite.location.degreesLat,
-              +satellite.location.degreesLong,
+              locations[i].location.degreesLat,
+              locations[i].location.degreesLong,
             ],
             path: getSatellitePath(
               satellite.line1,
