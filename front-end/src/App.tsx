@@ -11,7 +11,8 @@ import { useMemo, useState } from 'react';
 import { colors } from './constants.tsx';
 import type { AboutInfo } from './Types/about_info.ts';
 
-const satsGenInfo = [aboutISS, aboutHST, aboutCSS, aboutProject, aboutMe];
+const satsGenInfo = [aboutISS, aboutHST, aboutCSS];
+const genInfo = [aboutProject, aboutMe];
 
 function App() {
   const [openedPanel, setOpenedPanel] = useState({
@@ -40,18 +41,34 @@ function App() {
         }}
       >
         <div id="info-panel-nav-bar">
-          {satsGenInfo.map((info, i) => (
-            <button
-              key={`${info.name}-btn`}
-              className="nav-bar-section"
-              onClick={() => navBarOnClick(info, i)}
-              style={{
-                backgroundColor: `rgba(${colors[i % colors.length]}, 0.45)`,
-              }}
-            >
-              {info.name}
-            </button>
-          ))}
+          <div id="sats-gen-info">
+            {satsGenInfo.map((info, i) => (
+              <button
+                key={`${info.name}-btn`}
+                className="nav-bar-section"
+                onClick={() => navBarOnClick(info, i)}
+                style={{
+                  backgroundColor: `rgba(${colors[i % colors.length]}, 0.45)`,
+                }}
+              >
+                {info.name}
+              </button>
+            ))}
+          </div>
+          <div id="other-gen-info">
+            {genInfo.map((info, i) => (
+              <button
+                key={`${info.name}-btn`}
+                className="nav-bar-section"
+                onClick={() => navBarOnClick(info, satsGenInfo.length + i)}
+                style={{
+                  backgroundColor: `rgb(27, 46, 46)`,
+                }}
+              >
+                {info.name}
+              </button>
+            ))}
+          </div>
         </div>
         <p id="info-container">{openedPanel.info.about}</p>
       </div>
