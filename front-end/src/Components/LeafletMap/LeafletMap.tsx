@@ -6,25 +6,38 @@ import {
   useMap,
 } from 'react-leaflet';
 import type { MapContainerProps, TileLayerProps } from 'react-leaflet';
+import type { Map } from 'leaflet';
 import { Icon } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './LeafletMap.css';
 import { colors } from '../../constants.tsx';
 import { Fragment, useEffect, useMemo } from 'react';
 import satelliteIcon from '../../../img/iss.png';
+import useResizeObserver from '@react-hook/resize-observer';
 
 const MapController = () => {
+  const setMinimumZoom = useMemo(
+    () => (map: Map) => {
+      const width = map.getSize().x;
+      const widthAtZoom0 = 256;
+      const ratio = width / widthAtZoom0;
+      const minZoom = width > widthAtZoom0 ? Math.log(ratio) / Math.log(2) : 0;
+      if (map.getZoom() < minZoom) {
+        map.setZoom(minZoom);
+      }
+      map.setMinZoom(minZoom);
+    },
+    [],
+  );
+
   const map = useMap();
   useEffect(() => {
-    const width = map.getSize().x;
-    const widthAtZoom0 = 256;
-    const ratio = width / widthAtZoom0;
-    const minZoom = width > widthAtZoom0 ? Math.log(ratio) / Math.log(2) : 0;
-    if (map.getZoom() < minZoom) {
-      map.setZoom(minZoom);
-    }
-    map.setMinZoom(minZoom);
-  }, [map]);
+    setMinimumZoom(map);
+  }, [map, setMinimumZoom]);
+
+  useResizeObserver(map.getContainer(), () => {
+    setMinimumZoom(map);
+  });
 
   return <></>;
 };
