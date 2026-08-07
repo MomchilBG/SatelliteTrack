@@ -18,10 +18,12 @@ import useResizeObserver from '@react-hook/resize-observer';
 const MapController = () => {
   const setMinimumZoom = useMemo(
     () => (map: Map) => {
-      const width = map.getSize().x;
+      const mapSize = map.getSize();
+      const largerSide = mapSize.x > mapSize.y ? mapSize.x : mapSize.y;
       const widthAtZoom0 = 256;
-      const ratio = width / widthAtZoom0;
-      const minZoom = width > widthAtZoom0 ? Math.log(ratio) / Math.log(2) : 0;
+      const ratio = largerSide / widthAtZoom0;
+      const minZoom =
+        largerSide > widthAtZoom0 ? Math.log(ratio) / Math.log(2) : 0;
       if (map.getZoom() < minZoom) {
         map.setZoom(minZoom);
       }
