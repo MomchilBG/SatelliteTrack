@@ -24,6 +24,7 @@ body {
   display: flex;
   flex-direction: row;
   width: 100%;
+  height: 25rem;
   border: 3px solid gray;
   transition: background-color 0.5s;
 }
@@ -68,7 +69,6 @@ body {
   padding: 1.5rem;
   white-space: pre-line;
   text-align: left;
-  height: 40vh;
   overflow-y: scroll;
   margin: 0;
   font-size: 18px;
