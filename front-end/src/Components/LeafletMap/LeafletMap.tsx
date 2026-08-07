@@ -7,12 +7,27 @@ import {
 } from 'react-leaflet';
 import type { MapContainerProps, TileLayerProps } from 'react-leaflet';
 import { Icon } from 'leaflet';
-import type { LatLngBoundsExpression } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './LeafletMap.css';
 import { colors } from '../../constants.tsx';
 import { Fragment, useEffect, useMemo } from 'react';
 import satelliteIcon from '../../../img/iss.png';
+
+const MapController = () => {
+  const map = useMap();
+  useEffect(() => {
+    const width = map.getSize().x;
+    const widthAtZoom0 = 256;
+    const ratio = width / widthAtZoom0;
+    const minZoom = width > widthAtZoom0 ? Math.log(ratio) / Math.log(2) : 0;
+    if (map.getZoom() < minZoom) {
+      map.setZoom(minZoom);
+    }
+    map.setMinZoom(minZoom);
+  }, [map]);
+
+  return <></>;
+};
 
 const LeafletMap = ({
   satellites,
@@ -22,23 +37,6 @@ const LeafletMap = ({
     path: number[][][];
   }[];
 }) => {
-  const MapController = () => {
-    const map = useMap();
-    useEffect(() => {
-      const bounds: LatLngBoundsExpression = [
-        [-90, -180],
-        [90, 180],
-      ];
-      const minZoom = map.getBoundsZoom(bounds);
-      if (map.getZoom() < minZoom) {
-        map.setZoom(minZoom);
-      }
-      map.setMinZoom(minZoom);
-    }, [map]);
-
-    return <></>;
-  };
-
   const icon = useMemo(
     () =>
       new Icon({
@@ -50,8 +48,8 @@ const LeafletMap = ({
 
   const mapContainerProps: MapContainerProps = useMemo(
     () => ({
-      zoom: 2,
-      zoomSnap: 0.1,
+      zoom: 1,
+      zoomSnap: 0.01,
       center: [0, 0],
       scrollWheelZoom: true,
       maxBounds: [
@@ -59,7 +57,7 @@ const LeafletMap = ({
         [90, 180],
       ],
       maxBoundsViscosity: 1.0,
-      minZoom: 2,
+      minZoom: 1,
       preferCanvas: true,
     }),
     [],
@@ -67,7 +65,6 @@ const LeafletMap = ({
 
   const tileLayerProps: TileLayerProps = useMemo(
     () => ({
-      noWrap: true,
       url: 'https://{s}.tile.jawg.io/jawg-streets/{z}/{x}/{y}{r}.png?access-token=hHud8GDOi5a4Brzsy6hsVNp5CRyQRBREBCuYoVepy0hZRow9gORVtK5bw9Fb21jV',
       attribution:
         '<a href="https://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank">&copy; <b>Jawg</b>Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
