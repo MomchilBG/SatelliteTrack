@@ -33,6 +33,21 @@ export const convertTLEtoCoords = (
   };
 };
 
+const getLatAtAntimeridian = (
+  prevLong: number,
+  curLong: number,
+  prevLat: number,
+  curLat: number,
+) => {
+  const difLat = Math.abs(prevLat - curLat);
+  const prevDif = 180 - Math.abs(prevLong);
+  const curDif = 180 - Math.abs(curLong);
+  const ratio = prevDif / curDif;
+  return prevLat > curLat
+    ? prevLat - (difLat - difLat / (ratio + 1))
+    : prevLat + (difLat - difLat / (ratio + 1));
+};
+
 export const getSatellitePath = (
   line1: string,
   line2: string,
@@ -40,7 +55,7 @@ export const getSatellitePath = (
   period: number,
 ) => {
   const markersCoordinates = [];
-  let coordinatesUpToTheAntimeridian = [];
+  let coordinatesUpToTheAntimeridian: number[][] = [];
 
   for (let markerIndex = 0; markerIndex <= orbit_points; markerIndex++) {
     const currentTime = new Date();
@@ -65,8 +80,20 @@ export const getSatellitePath = (
       prevCoord[1] * degreesLong < 0 &&
       Math.abs(prevCoord[1]) > 90
     ) {
+      const antimeridianLat = getLatAtAntimeridian(
+        prevCoord[1],
+        degreesLong,
+        prevCoord[0],
+        degreesLat,
+      );
+      coordinatesUpToTheAntimeridian.push([
+        antimeridianLat,
+        prevCoord[1] < 0 ? -180 : 180,
+      ]);
       markersCoordinates.push(coordinatesUpToTheAntimeridian);
-      coordinatesUpToTheAntimeridian = [];
+      coordinatesUpToTheAntimeridian = [
+        [antimeridianLat, degreesLong < 0 ? -180 : 180],
+      ];
     } else {
       coordinatesUpToTheAntimeridian.push([degreesLat, degreesLong]);
     }
