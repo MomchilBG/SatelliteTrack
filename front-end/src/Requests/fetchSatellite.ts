@@ -1,11 +1,11 @@
 import axios from 'axios';
-import type { Satellite } from '../Types/satellite.ts';
+import type { fetchedTLEs } from '../Types/satellite.ts';
 
 export const fetchData = async (
   satellite: string,
-): Promise<Satellite | Satellite[]> => {
+): Promise<fetchedTLEs | fetchedTLEs[]> => {
   try {
-    const response = await axios.get<Satellite | Satellite[]>(
+    const response = await axios.get<fetchedTLEs | fetchedTLEs[]>(
       `http://localhost:5001/${satellite}`,
       {
         responseType: 'json',

@@ -97,8 +97,13 @@ const LeafletMap = ({
       <TileLayer key="tileLayer" {...tileLayerProps} />
       {satellites.map((satellite, id: number) => (
         <Fragment key={`frag-${id}`}>
-          <Marker position={satellite.marker_coords} icon={icon} />
+          <Marker
+            key={`marker-${satellite.key}`}
+            position={satellite.marker_coords}
+            icon={icon}
+          />
           <Polyline
+            key={`path-${satellite.key}`}
             // @ts-expect-error uwu
             positions={satellite.path}
             color={`rgb(${colors[satellite.key as keyof typeof colors]})`}

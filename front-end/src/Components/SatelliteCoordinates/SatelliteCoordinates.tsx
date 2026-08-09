@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
 import { fetchData } from '../../Requests/fetchSatellite.ts';
 import LeafletMap from '../LeafletMap/LeafletMap.tsx';
 import './SatelliteCoordinates.css';
@@ -8,9 +8,10 @@ import {
 } from '../../util_funcs/util_funcs.ts';
 import CollapsableInfo from '../CollaspableInfo/CollapsableInfo.tsx';
 import TrackingInfoPanel from '../TrackingInfoPanel/TrackingInfoPanel.tsx';
-import type { Satellite } from '../../Types/satellite.ts';
+import type { fetchedTLEs, Satellite } from '../../Types/satellite.ts';
+import SatVisibilityToggle from '../SatVisibilityToggle/SatVisibilityToggle.tsx';
 
-const initialFetch: Satellite[] = await fetchData('all')
+const initialFetch: fetchedTLEs[] = await fetchData('all')
   .then((response) => (Array.isArray(response) ? response : [response]))
   .catch((error) => {
     console.log(error);
@@ -33,9 +34,11 @@ const GetData = () => {
       line2: TLE.line2,
       name: TLE.name,
       id: TLE.id,
+      key: TLE.name.split(' ')[0].toLowerCase(),
       ORBIT_POINTS: TLE.ORBIT_POINTS,
       PERIOD_BETWEEN_POINTS: TLE.PERIOD_BETWEEN_POINTS,
       loaded: TLE.line1 === '' ? false : true,
+      visible: true,
     })),
   );
   const [locations, setLocations] = useState(
@@ -64,14 +67,16 @@ const GetData = () => {
         .then((response) => {
           const fetchedTLEs = Array.isArray(response) ? response : [response];
           setTLEs(
-            fetchedTLEs.map((TLE) => ({
+            fetchedTLEs.map((TLE, i) => ({
               line1: TLE.line1,
               line2: TLE.line2,
               name: TLE.name,
               id: TLE.id,
+              key: TLEs[i].key,
               ORBIT_POINTS: TLE.ORBIT_POINTS,
               PERIOD_BETWEEN_POINTS: TLE.PERIOD_BETWEEN_POINTS,
               loaded: true,
+              visible: TLEs[i].visible,
             })),
           );
         })
@@ -81,7 +86,7 @@ const GetData = () => {
     }, 20000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [TLEs]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -94,6 +99,7 @@ const GetData = () => {
         );
       }
     }, 1000);
+
     return () => clearInterval(interval);
   }, [TLEs]);
 
@@ -107,37 +113,65 @@ const GetData = () => {
     [display],
   );
 
+  const toggleVisibility = useMemo(
+    () => (satellite: Satellite) => {
+      satellite.visible = !satellite.visible;
+    },
+    [],
+  );
+
   return TLEs[0].loaded && locations[0].loaded ? (
     <div id="app">
       <div id="data">
         {TLEs.map((satellite, i) => (
-          <CollapsableInfo
-            key={i}
-            colorsKey={satellite.name.split(' ')[0].toLowerCase()}
-            title={satellite.name}
-            props={{ satellite: { ...satellite, ...locations[i] } }}
-            Comp={TrackingInfoPanel}
-            id={i}
-            onClick={expandInfo}
-            display={display[i as keyof typeof display]}
-          />
+          <Fragment key={i}>
+            <CollapsableInfo
+              colorsKey={satellite.name.split(' ')[0].toLowerCase()}
+              title={satellite.name}
+              props={{ satellite: { ...satellite, ...locations[i] } }}
+              Comp={TrackingInfoPanel}
+              id={i}
+              onClick={expandInfo}
+              display={display[i as keyof typeof display]}
+            />
+            <SatVisibilityToggle
+              onClick={toggleVisibility}
+              satellite={satellite}
+            />
+          </Fragment>
         ))}
       </div>
       <div id="map-info">
         <LeafletMap
-          satellites={TLEs.map((satellite, i) => ({
-            key: satellite.name.split(' ')[0].toLowerCase(),
-            marker_coords: [
-              locations[i].location.degreesLat,
-              locations[i].location.degreesLong,
-            ],
-            path: getSatellitePath(
-              satellite.line1,
-              satellite.line2,
-              satellite.ORBIT_POINTS,
-              satellite.PERIOD_BETWEEN_POINTS,
-            ),
-          }))}
+          satellites={TLEs.reduce(
+            (
+              prev: {
+                key: string;
+                marker_coords: [number, number];
+                path: number[][][];
+              }[],
+              current,
+              i,
+            ) => {
+              if (current.visible === true) {
+                prev.push({
+                  key: current.key,
+                  marker_coords: [
+                    locations[i].location.degreesLat,
+                    locations[i].location.degreesLong,
+                  ],
+                  path: getSatellitePath(
+                    current.line1,
+                    current.line2,
+                    current.ORBIT_POINTS,
+                    current.PERIOD_BETWEEN_POINTS,
+                  ),
+                });
+              }
+              return prev;
+            },
+            [],
+          )}
         />
       </div>
     </div>
