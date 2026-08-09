@@ -48,6 +48,7 @@ const LeafletMap = ({
   satellites,
 }: {
   satellites: {
+    key: string;
     marker_coords: [number, number];
     path: number[][][];
   }[];
@@ -96,16 +97,11 @@ const LeafletMap = ({
       <TileLayer key="tileLayer" {...tileLayerProps} />
       {satellites.map((satellite, id: number) => (
         <Fragment key={`frag-${id}`}>
-          <Marker
-            key={`marker-${id}`}
-            position={satellite.marker_coords}
-            icon={icon}
-          />
+          <Marker position={satellite.marker_coords} icon={icon} />
           <Polyline
-            key={`polyline-${id}`}
             // @ts-expect-error uwu
             positions={satellite.path}
-            color={`rgb(${colors[id % colors.length]})`}
+            color={`rgb(${colors[satellite.key as keyof typeof colors]})`}
             weight={2}
           />
         </Fragment>

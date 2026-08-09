@@ -1,17 +1,16 @@
 import type { AboutInfo } from './Types/about_info';
 
-export const colors = [
-  '0, 0, 255',
-  '255, 0, 0',
-  '0, 255, 0',
-  '255, 166, 0',
-  '192, 0, 192',
-  '0, 255, 255',
-  '255, 0, 255',
-  '255, 255, 0',
-];
+export const colors = {
+  iss: '0, 0, 255',
+  hst: '255, 0, 0',
+  css: '0, 255, 0',
+  otherSat: '255, 255, 0',
+  satelliteTrack: '255, 166, 0',
+  aboutMe: '192, 0, 192',
+};
 
 export const aboutISS: AboutInfo = Object.freeze({
+  key: 'iss',
   name: 'ISS',
   about: (
     <>
@@ -134,6 +133,7 @@ export const aboutISS: AboutInfo = Object.freeze({
 });
 
 export const aboutHST: AboutInfo = Object.freeze({
+  key: 'hst',
   name: 'Hubble',
   about: (
     <>
@@ -232,6 +232,7 @@ export const aboutHST: AboutInfo = Object.freeze({
 });
 
 export const aboutCSS: AboutInfo = Object.freeze({
+  key: 'css',
   name: 'CSS',
   about: (
     <>
@@ -318,6 +319,7 @@ export const aboutCSS: AboutInfo = Object.freeze({
 });
 
 export const aboutProject: AboutInfo = Object.freeze({
+  key: 'satelliteTrack',
   name: 'About SatelliteTrack',
   about: (
     <>
@@ -385,6 +387,7 @@ export const aboutProject: AboutInfo = Object.freeze({
 });
 
 export const aboutMe: AboutInfo = Object.freeze({
+  key: 'aboutMe',
   name: 'About Me :D',
   about: (
     <>

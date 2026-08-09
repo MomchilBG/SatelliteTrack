@@ -113,6 +113,7 @@ const GetData = () => {
         {TLEs.map((satellite, i) => (
           <CollapsableInfo
             key={i}
+            colorsKey={satellite.name.split(' ')[0].toLowerCase()}
             title={satellite.name}
             props={{ satellite: { ...satellite, ...locations[i] } }}
             Comp={TrackingInfoPanel}
@@ -125,6 +126,7 @@ const GetData = () => {
       <div id="map-info">
         <LeafletMap
           satellites={TLEs.map((satellite, i) => ({
+            key: satellite.name.split(' ')[0].toLowerCase(),
             marker_coords: [
               locations[i].location.degreesLat,
               locations[i].location.degreesLong,

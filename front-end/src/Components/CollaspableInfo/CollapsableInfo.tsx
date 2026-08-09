@@ -4,6 +4,7 @@ import './CollapsableInfo.css';
 import React from 'react';
 
 const CollapsableInfo = ({
+  colorsKey,
   title,
   props,
   id,
@@ -11,12 +12,13 @@ const CollapsableInfo = ({
   onClick,
   display,
 }: {
+  colorsKey: string;
   title: string;
   props: { satellite: SatelliteInfo };
   id: number;
   Comp: React.ComponentType<{
     satellite: SatelliteInfo;
-    id: number;
+    colorsKey: string;
     display: string;
   }>;
   onClick: (id: number) => void;
@@ -29,12 +31,12 @@ const CollapsableInfo = ({
         className="collapsable-info"
         key={`collapsable-info-${id}`}
         style={{
-          backgroundColor: `rgba(${colors[id % colors.length]}, 0.45)`,
+          backgroundColor: `rgba(${colors[colorsKey as keyof typeof colors]}, 0.45)`,
         }}
       >
         {title}
       </button>
-      <Comp {...{ ...props, id: id, display: display }} />
+      <Comp {...{ ...props, colorsKey: colorsKey, display: display }} />
     </>
   );
 };

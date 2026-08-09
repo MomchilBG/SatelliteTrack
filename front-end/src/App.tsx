@@ -17,16 +17,15 @@ const genInfo = [aboutProject, aboutMe];
 function App() {
   const [openedPanel, setOpenedPanel] = useState({
     info: { ...aboutISS },
-    id: 0,
   });
 
   const navBarOnClick = useMemo(
-    () => (info: AboutInfo, id: number) => {
+    () => (info: AboutInfo) => {
       // Set the info container to be in its most scrolled-up position
       const infoContainer = document.querySelector('#info-container');
       if (infoContainer) infoContainer.scrollTop = 0;
 
-      setOpenedPanel({ info: info, id: id });
+      setOpenedPanel({ info: info });
     },
     [],
   );
@@ -37,18 +36,18 @@ function App() {
       <div
         id="panels-container"
         style={{
-          backgroundColor: `rgba(${colors[openedPanel.id % colors.length]}, 0.35)`,
+          backgroundColor: `rgba(${colors[openedPanel.info.key as keyof typeof colors]}, 0.35)`,
         }}
       >
         <div id="info-panel-nav-bar">
           <div id="sats-gen-info">
-            {satsGenInfo.map((info, i) => (
+            {satsGenInfo.map((info) => (
               <button
                 key={`${info.name}-btn`}
                 className="nav-bar-section"
-                onClick={() => navBarOnClick(info, i)}
+                onClick={() => navBarOnClick(info)}
                 style={{
-                  backgroundColor: `rgba(${colors[i % colors.length]}, 0.45)`,
+                  backgroundColor: `rgba(${colors[info.key as keyof typeof colors]}, 0.45)`,
                 }}
               >
                 {info.name}
@@ -56,11 +55,11 @@ function App() {
             ))}
           </div>
           <div id="other-gen-info">
-            {genInfo.map((info, i) => (
+            {genInfo.map((info) => (
               <button
                 key={`${info.name}-btn`}
                 className="nav-bar-section"
-                onClick={() => navBarOnClick(info, satsGenInfo.length + i)}
+                onClick={() => navBarOnClick(info)}
                 style={{
                   backgroundColor: `rgb(27, 46, 46)`,
                 }}
