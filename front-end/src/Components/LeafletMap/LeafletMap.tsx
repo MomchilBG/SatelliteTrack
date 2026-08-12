@@ -11,26 +11,23 @@ import { Icon } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './LeafletMap.css';
 import { colors } from '../../constants.tsx';
-import { Fragment, useEffect, useMemo } from 'react';
+import { Fragment, useCallback, useEffect, useMemo } from 'react';
 import satelliteIcon from '../../../img/iss.png';
 import useResizeObserver from '@react-hook/resize-observer';
 
 const MapController = () => {
-  const setMinimumZoom = useMemo(
-    () => (map: Map) => {
-      const mapSize = map.getSize();
-      const largerSide = mapSize.x > mapSize.y ? mapSize.x : mapSize.y;
-      const widthAtZoom0 = 256;
-      const ratio = largerSide / widthAtZoom0;
-      const minZoom =
-        largerSide > widthAtZoom0 ? Math.log(ratio) / Math.log(2) : 0;
-      if (map.getZoom() < minZoom) {
-        map.setZoom(minZoom);
-      }
-      map.setMinZoom(minZoom);
-    },
-    [],
-  );
+  const setMinimumZoom = useCallback((map: Map) => {
+    const mapSize = map.getSize();
+    const largerSide = mapSize.x > mapSize.y ? mapSize.x : mapSize.y;
+    const widthAtZoom0 = 256;
+    const ratio = largerSide / widthAtZoom0;
+    const minZoom =
+      largerSide > widthAtZoom0 ? Math.log(ratio) / Math.log(2) : 0;
+    if (map.getZoom() < minZoom) {
+      map.setZoom(minZoom);
+    }
+    map.setMinZoom(minZoom);
+  }, []);
 
   const map = useMap();
   useEffect(() => {

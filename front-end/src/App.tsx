@@ -7,7 +7,7 @@ import {
   aboutMe,
 } from './constants.tsx';
 import GetData from './Components/SatelliteCoordinates/SatelliteCoordinates.tsx';
-import { useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { colors } from './constants.tsx';
 import type { AboutInfo } from './Types/about_info.ts';
 
@@ -19,16 +19,13 @@ function App() {
     info: { ...aboutISS },
   });
 
-  const navBarOnClick = useMemo(
-    () => (info: AboutInfo) => {
-      // Set the info container to be in its most scrolled-up position
-      const infoContainer = document.querySelector('#info-container');
-      if (infoContainer) infoContainer.scrollTop = 0;
+  const navBarOnClick = useCallback((info: AboutInfo) => {
+    // Set the info container to be in its most scrolled-up position
+    const infoContainer = document.querySelector('#info-container');
+    if (infoContainer) infoContainer.scrollTop = 0;
 
-      setOpenedPanel({ info: info });
-    },
-    [],
-  );
+    setOpenedPanel({ info: info });
+  }, []);
 
   return (
     <>

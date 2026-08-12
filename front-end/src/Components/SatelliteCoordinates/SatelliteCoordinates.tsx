@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useMemo, useState } from 'react';
+import { Fragment, useCallback, useEffect, useState } from 'react';
 import { fetchData } from '../../Requests/fetchSatellite.ts';
 import LeafletMap from '../LeafletMap/LeafletMap.tsx';
 import './SatelliteCoordinates.css';
@@ -103,8 +103,8 @@ const GetData = () => {
     return () => clearInterval(interval);
   }, [TLEs]);
 
-  const expandInfo = useMemo(
-    () => (id: number) => {
+  const expandInfo = useCallback(
+    (id: number) => {
       const copy = { ...display };
       copy[id as keyof typeof copy] =
         copy[id as keyof typeof copy] === 'none' ? 'block' : 'none';
@@ -113,12 +113,9 @@ const GetData = () => {
     [display],
   );
 
-  const toggleVisibility = useMemo(
-    () => (satellite: Satellite) => {
-      satellite.visible = !satellite.visible;
-    },
-    [],
-  );
+  const toggleVisibility = useCallback((satellite: Satellite) => {
+    satellite.visible = !satellite.visible;
+  }, []);
 
   return TLEs[0].loaded && locations[0].loaded ? (
     <div id="app">
