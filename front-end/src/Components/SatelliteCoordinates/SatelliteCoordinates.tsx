@@ -17,10 +17,10 @@ const initialFetch: fetchedTLEs[] = await fetchData('all')
     console.log(error);
     return [
       {
-        line1: '',
-        line2: '',
         name: '',
         id: '',
+        line1: '',
+        line2: '',
         ORBIT_POINTS: 0,
         PERIOD_BETWEEN_POINTS: 0,
       },
@@ -28,15 +28,15 @@ const initialFetch: fetchedTLEs[] = await fetchData('all')
   });
 
 const GetData = () => {
-  const [TLEs, setTLEs] = useState(
+  const [TLEs, setTLEs] = useState<Satellite[]>(
     initialFetch.map((TLE) => ({
-      line1: TLE.line1,
-      line2: TLE.line2,
       name: TLE.name,
       id: TLE.id,
-      key: TLE.name.split(' ')[0].toLowerCase(),
+      line1: TLE.line1,
+      line2: TLE.line2,
       ORBIT_POINTS: TLE.ORBIT_POINTS,
       PERIOD_BETWEEN_POINTS: TLE.PERIOD_BETWEEN_POINTS,
+      key: TLE.name.split(' ')[0].toLowerCase(),
       loaded: TLE.line1 === '' ? false : true,
       visible: true,
     })),
@@ -68,13 +68,13 @@ const GetData = () => {
           const fetchedTLEs = Array.isArray(response) ? response : [response];
           setTLEs(
             fetchedTLEs.map((TLE, i) => ({
-              line1: TLE.line1,
-              line2: TLE.line2,
               name: TLE.name,
               id: TLE.id,
-              key: TLEs[i].key,
+              line1: TLE.line1,
+              line2: TLE.line2,
               ORBIT_POINTS: TLE.ORBIT_POINTS,
               PERIOD_BETWEEN_POINTS: TLE.PERIOD_BETWEEN_POINTS,
+              key: TLEs[i].key,
               loaded: true,
               visible: TLEs[i].visible,
             })),

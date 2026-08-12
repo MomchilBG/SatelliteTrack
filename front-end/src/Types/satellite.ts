@@ -10,23 +10,25 @@ export type fetchedTLEs = {
 export type Satellite = {
   name: string;
   id: string;
-  key: string;
   line1: string;
   line2: string;
   ORBIT_POINTS: number;
   PERIOD_BETWEEN_POINTS: number;
+  key: string;
   visible: boolean;
+  loaded: boolean;
 };
 
 export type SatelliteInfo = {
-  line1: string;
-  line2: string;
   name: string;
   id: string;
-  key: string;
+  line1: string;
+  line2: string;
   ORBIT_POINTS: number;
   PERIOD_BETWEEN_POINTS: number;
+  key: string;
   visible: boolean;
+  loaded: boolean;
   location: {
     height: number;
     degreesLat: number;
