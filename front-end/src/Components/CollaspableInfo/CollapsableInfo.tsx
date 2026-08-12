@@ -28,7 +28,7 @@ const CollapsableInfo = ({
     <>
       <button
         onClick={() => onClick(id)}
-        className="collapsable-info"
+        className="collapsable-info-toggle"
         key={`collapsable-info-${id}`}
         style={{
           backgroundColor: `rgba(${colors[colorsKey as keyof typeof colors]}, 0.45)`,

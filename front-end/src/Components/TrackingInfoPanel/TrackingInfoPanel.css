@@ -1,10 +1,9 @@
-.satellite-info {
+.tracking-info {
   display: none;
   width: 100%;
   justify-items: left;
   padding-left: 1.5rem;
   box-sizing: border-box;
-  margin-top: -0.5rem;
 }
 
 .data-item {

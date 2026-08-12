@@ -13,8 +13,8 @@ const TrackingInfoPanel = ({
 }) => {
   return (
     <div
-      key={`satellite-info-${colorsKey}`}
-      className="satellite-info"
+      key={`tracking-info-${colorsKey}`}
+      className="tracking-info"
       style={{
         backgroundColor: `rgba(${colors[colorsKey as keyof typeof colors]}, 0.35)`,
         display: display,

@@ -1,0 +1,22 @@
+.visibility-toggle {
+  width: 15%;
+  border-radius: 0;
+  border: none;
+  background-color: rgb(40, 40, 40);
+  color: white;
+  text-align: center;
+  font-size: 20px;
+}
+
+.visibility-toggle:hover {
+  cursor: pointer;
+  background-color: rgb(70, 70, 70);
+}
+
+.visible::after {
+  content: '\25c8';
+}
+
+.not-visible::after {
+  content: '\25c7';
+}

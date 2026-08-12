@@ -28,3 +28,10 @@
   overflow-y: scroll;
   overscroll-behavior-y: none;
 }
+
+.satellite-data-panel-item {
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+}

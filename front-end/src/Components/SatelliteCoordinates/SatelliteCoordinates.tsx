@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { fetchData } from '../../Requests/fetchSatellite.ts';
 import LeafletMap from '../LeafletMap/LeafletMap.tsx';
 import './SatelliteCoordinates.css';
@@ -113,15 +113,30 @@ const GetData = () => {
     [display],
   );
 
-  const toggleVisibility = useCallback((satellite: Satellite) => {
-    satellite.visible = !satellite.visible;
-  }, []);
+  const toggleVisibility = useCallback(
+    (satellite: Satellite, element: HTMLButtonElement) => {
+      if (satellite.visible === true) {
+        satellite.visible = false;
+        element.classList.remove('visible');
+        element.classList.add('not-visible');
+      } else if (satellite.visible === false) {
+        satellite.visible = true;
+        element.classList.remove('not-visible');
+        element.classList.add('visible');
+      }
+    },
+    [],
+  );
 
   return TLEs[0].loaded && locations[0].loaded ? (
     <div id="app">
       <div id="data">
         {TLEs.map((satellite, i) => (
-          <Fragment key={i}>
+          <div className="satellite-data-panel-item" key={i}>
+            <SatVisibilityToggle
+              onClick={toggleVisibility}
+              satellite={satellite}
+            />
             <CollapsableInfo
               colorsKey={satellite.name.split(' ')[0].toLowerCase()}
               title={satellite.name}
@@ -131,11 +146,7 @@ const GetData = () => {
               onClick={expandInfo}
               display={display[i as keyof typeof display]}
             />
-            <SatVisibilityToggle
-              onClick={toggleVisibility}
-              satellite={satellite}
-            />
-          </Fragment>
+          </div>
         ))}
       </div>
       <div id="map-info">
