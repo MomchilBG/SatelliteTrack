@@ -14,23 +14,19 @@ export const fetchData = async (
 
     return (
       response?.data ?? {
-        line1: '',
-        line2: '',
         name: '',
         id: '',
-        ORBIT_POINTS: 0,
-        PERIOD_BETWEEN_POINTS: 0,
+        line1: '',
+        line2: '',
       }
     );
   } catch (error) {
     console.error('Error fetching data:', error);
     return {
-      line1: '',
-      line2: '',
       name: '',
       id: '',
-      ORBIT_POINTS: 0,
-      PERIOD_BETWEEN_POINTS: 0,
+      line1: '',
+      line2: '',
     };
   }
 };

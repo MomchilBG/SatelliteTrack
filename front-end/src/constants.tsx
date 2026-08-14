@@ -1,13 +1,21 @@
 import type { AboutInfo } from './Types/about_info';
 
+export const periodInSec = 15;
+
 export const colors = {
   iss: '0, 0, 255',
   hst: '255, 0, 0',
   css: '0, 255, 0',
-  otherSat: '255, 255, 0',
+  otherSat: '130, 0, 140',
   satelliteTrack: '255, 166, 0',
   aboutMe: '192, 0, 192',
 };
+
+export const defaultNoradIDs = Object.freeze({
+  ISS: 25544,
+  HUBBLE: 20580,
+  CSS: 48274,
+});
 
 export const aboutISS: AboutInfo = Object.freeze({
   key: 'iss',

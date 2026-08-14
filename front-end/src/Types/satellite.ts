@@ -3,8 +3,6 @@ export type fetchedTLEs = {
   id: string;
   line1: string;
   line2: string;
-  ORBIT_POINTS: number;
-  PERIOD_BETWEEN_POINTS: number;
 };
 
 export type Satellite = {
@@ -12,8 +10,6 @@ export type Satellite = {
   id: string;
   line1: string;
   line2: string;
-  ORBIT_POINTS: number;
-  PERIOD_BETWEEN_POINTS: number;
   key: string;
   visible: boolean;
   loaded: boolean;
@@ -24,8 +20,6 @@ export type SatelliteInfo = {
   id: string;
   line1: string;
   line2: string;
-  ORBIT_POINTS: number;
-  PERIOD_BETWEEN_POINTS: number;
   key: string;
   visible: boolean;
   loaded: boolean;
@@ -35,4 +29,9 @@ export type SatelliteInfo = {
     degreesLong: number;
     velocity: number;
   };
+};
+
+export type PostSatelliteResponse = {
+  success: boolean;
+  satellite: fetchedTLEs;
 };

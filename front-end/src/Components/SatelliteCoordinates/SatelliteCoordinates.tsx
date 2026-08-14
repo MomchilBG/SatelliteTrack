@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { fetchData } from '../../Requests/fetchSatellite.ts';
+import { postSatellite } from '../../Requests/postSatellite.ts';
 import LeafletMap from '../LeafletMap/LeafletMap.tsx';
 import './SatelliteCoordinates.css';
 import {
@@ -10,6 +11,7 @@ import CollapsableInfo from '../CollaspableInfo/CollapsableInfo.tsx';
 import TrackingInfoPanel from '../TrackingInfoPanel/TrackingInfoPanel.tsx';
 import type { fetchedTLEs, Satellite } from '../../Types/satellite.ts';
 import SatVisibilityToggle from '../SatVisibilityToggle/SatVisibilityToggle.tsx';
+import AddSatellitePanel from '../AddSatellitePanel/AddSatellitePanel.tsx';
 
 const initialFetch: fetchedTLEs[] = await fetchData('all')
   .then((response) => (Array.isArray(response) ? response : [response]))
@@ -34,13 +36,12 @@ const GetData = () => {
       id: TLE.id,
       line1: TLE.line1,
       line2: TLE.line2,
-      ORBIT_POINTS: TLE.ORBIT_POINTS,
-      PERIOD_BETWEEN_POINTS: TLE.PERIOD_BETWEEN_POINTS,
       key: TLE.name.split(' ')[0].toLowerCase(),
       loaded: TLE.line1 === '' ? false : true,
       visible: true,
     })),
   );
+  const [addedSatellite, setAddedSatellite] = useState<Satellite[]>([]);
   const [locations, setLocations] = useState(
     TLEs[0].loaded
       ? TLEs.map((TLE) => ({
@@ -72,11 +73,9 @@ const GetData = () => {
               id: TLE.id,
               line1: TLE.line1,
               line2: TLE.line2,
-              ORBIT_POINTS: TLE.ORBIT_POINTS,
-              PERIOD_BETWEEN_POINTS: TLE.PERIOD_BETWEEN_POINTS,
-              key: TLEs[i].key,
+              key: i < TLEs.length ? TLEs[i].key : '',
               loaded: true,
-              visible: TLEs[i].visible,
+              visible: i < TLEs.length ? TLEs[i].visible : true,
             })),
           );
         })
@@ -92,7 +91,7 @@ const GetData = () => {
     const interval = setInterval(() => {
       if (TLEs[0].loaded) {
         setLocations(
-          TLEs.map((TLE) => ({
+          [...TLEs, ...addedSatellite].map((TLE) => ({
             location: convertTLEtoCoords(TLE.line1, TLE.line2),
             loaded: true,
           })),
@@ -101,7 +100,7 @@ const GetData = () => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [TLEs]);
+  }, [TLEs, addedSatellite]);
 
   const expandInfo = useCallback(
     (id: number) => {
@@ -128,10 +127,36 @@ const GetData = () => {
     [],
   );
 
+  const handlePost = async (noradID: number) => {
+    try {
+      const addedTLE = (await postSatellite(noradID)).satellite;
+      const addedSatellite: Satellite = {
+        ...addedTLE,
+        key: addedTLE.name.split(' ')[0].toLowerCase(),
+        loaded: true,
+        visible: true,
+      };
+      setAddedSatellite([addedSatellite]);
+      setLocations([
+        ...locations,
+        {
+          location: convertTLEtoCoords(
+            addedSatellite.line1,
+            addedSatellite.line2,
+          ),
+          loaded: true,
+        },
+      ]);
+    } catch (e) {
+      console.log(`Error handling post: ${e}`);
+    }
+  };
+
   return TLEs[0].loaded && locations[0].loaded ? (
     <div id="app">
+      <AddSatellitePanel handlePost={handlePost} />
       <div id="data">
-        {TLEs.map((satellite, i) => (
+        {[...TLEs, ...addedSatellite].map((satellite, i) => (
           <div className="satellite-data-panel-item" key={i}>
             <SatVisibilityToggle
               onClick={toggleVisibility}
@@ -151,7 +176,7 @@ const GetData = () => {
       </div>
       <div id="map-info">
         <LeafletMap
-          satellites={TLEs.reduce(
+          satellites={[...TLEs, ...addedSatellite].reduce(
             (
               prev: {
                 key: string;
@@ -168,12 +193,7 @@ const GetData = () => {
                     locations[i].location.degreesLat,
                     locations[i].location.degreesLong,
                   ],
-                  path: getSatellitePath(
-                    current.line1,
-                    current.line2,
-                    current.ORBIT_POINTS,
-                    current.PERIOD_BETWEEN_POINTS,
-                  ),
+                  path: getSatellitePath(current.line1, current.line2),
                 });
               }
               return prev;

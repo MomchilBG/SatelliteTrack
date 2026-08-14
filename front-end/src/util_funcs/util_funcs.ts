@@ -1,4 +1,5 @@
 import * as satellite from 'satellite.js';
+import { periodInSec } from '../constants';
 
 export const convertTLEtoCoords = (
   line1: string,
@@ -48,16 +49,13 @@ const getLatAtAntimeridian = (
     : prevLat + (difLat - difLat / (ratio + 1));
 };
 
-export const getSatellitePath = (
-  line1: string,
-  line2: string,
-  orbit_points: number,
-  period: number,
-) => {
-  const markersCoordinates = [];
+export const getSatellitePath = (line1: string, line2: string) => {
+  const markersCoordinates: number[][][] = [];
   let coordinatesUpToTheAntimeridian: number[][] = [];
+  let condition = true;
+  let markerIndex = 0;
 
-  for (let markerIndex = 0; markerIndex <= orbit_points; markerIndex++) {
+  while (condition) {
     const currentTime = new Date();
     const prevCoord =
       coordinatesUpToTheAntimeridian[
@@ -71,31 +69,46 @@ export const getSatellitePath = (
       line1,
       line2,
       new Date(
-        currentTime.setSeconds(currentTime.getSeconds() + markerIndex * period),
+        currentTime.setSeconds(
+          currentTime.getSeconds() + markerIndex * periodInSec,
+        ),
       ),
     );
 
     if (
-      prevCoord !== null &&
-      prevCoord[1] * degreesLong < 0 &&
-      Math.abs(prevCoord[1]) > 90
+      coordinatesUpToTheAntimeridian.length > 1000 ||
+      (markersCoordinates.length > 0 &&
+        ((markersCoordinates[0][0][1] < degreesLong &&
+          markersCoordinates[0][0][1] > prevCoord[1]) ||
+          (markersCoordinates[0][0][1] > degreesLong &&
+            markersCoordinates[0][0][1] < prevCoord[1])))
     ) {
-      const antimeridianLat = getLatAtAntimeridian(
-        prevCoord[1],
-        degreesLong,
-        prevCoord[0],
-        degreesLat,
-      );
-      coordinatesUpToTheAntimeridian.push([
-        antimeridianLat,
-        prevCoord[1] < 0 ? -180 : 180,
-      ]);
-      markersCoordinates.push(coordinatesUpToTheAntimeridian);
-      coordinatesUpToTheAntimeridian = [
-        [antimeridianLat, degreesLong < 0 ? -180 : 180],
-      ];
+      condition = false;
     } else {
-      coordinatesUpToTheAntimeridian.push([degreesLat, degreesLong]);
+      if (
+        prevCoord !== null &&
+        prevCoord[1] * degreesLong < 0 &&
+        Math.abs(prevCoord[1]) > 90
+      ) {
+        const antimeridianLat = getLatAtAntimeridian(
+          prevCoord[1],
+          degreesLong,
+          prevCoord[0],
+          degreesLat,
+        );
+        coordinatesUpToTheAntimeridian.push([
+          antimeridianLat,
+          prevCoord[1] < 0 ? -180 : 180,
+        ]);
+        markersCoordinates.push(coordinatesUpToTheAntimeridian);
+        coordinatesUpToTheAntimeridian = [
+          [antimeridianLat, degreesLong < 0 ? -180 : 180],
+        ];
+      } else {
+        coordinatesUpToTheAntimeridian.push([degreesLat, degreesLong]);
+      }
+
+      markerIndex++;
     }
   }
 
