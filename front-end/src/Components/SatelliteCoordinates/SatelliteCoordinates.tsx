@@ -128,7 +128,7 @@ const GetData = () => {
     [],
   );
 
-  const handlePost = async (noradID: number) => {
+  const handlePost = async (noradID: string) => {
     try {
       const addedTLE = (await postSatellite(noradID)).satellite;
       const addedSatellite: Satellite = {

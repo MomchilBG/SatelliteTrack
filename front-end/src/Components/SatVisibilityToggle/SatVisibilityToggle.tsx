@@ -1,4 +1,4 @@
-import type { Satellite } from '../../Types/satellite';
+import type { Satellite } from '../../Types/satellite.ts';
 import './SatVisibilityToggle.css';
 
 const SatVisibilityToggle = ({

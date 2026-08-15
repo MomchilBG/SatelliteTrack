@@ -1,4 +1,4 @@
-import type { AboutInfo } from './Types/about_info';
+import type { AboutInfo } from './Types/about_info.ts';
 
 export const periodInSec = 15;
 

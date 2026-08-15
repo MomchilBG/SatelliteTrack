@@ -1,5 +1,5 @@
 import * as satellite from 'satellite.js';
-import { periodInSec } from '../constants';
+import { periodInSec } from '../constants.tsx';
 
 export const convertTLEtoCoords = (
   line1: string,

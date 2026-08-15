@@ -1,20 +1,20 @@
 import './AddSatellitePanel.css';
 import { useCallback, useState } from 'react';
-import { defaultNoradIDs } from '../../constants';
+import { defaultNoradIDs } from '../../constants.tsx';
 
 const AddSatellitePanel = ({
   handlePost,
 }: {
-  handlePost: (noradID: number) => void;
+  handlePost: (noradID: string) => void;
 }) => {
   const [inputContent, setInputContent] = useState('');
-  const [noradID, setNoradID] = useState(0);
+  const [noradID, setNoradID] = useState('0');
   const [message, setMessage] = useState({
     success: false,
     error: false,
     content: '',
   });
-  const [lastAdded, setLastAdded] = useState(0);
+  const [lastAdded, setLastAdded] = useState('0');
 
   const handleChange = useCallback(
     (input: HTMLInputElement) => {
@@ -34,7 +34,7 @@ const AddSatellitePanel = ({
           content: 'Please type a valid NoradID!',
         });
       } else if (
-        +content === lastAdded ||
+        +content === +lastAdded ||
         Object.values(defaultNoradIDs).some((id) => +content === id)
       ) {
         setMessage({
@@ -48,14 +48,14 @@ const AddSatellitePanel = ({
           error: false,
           content: '',
         });
-        setNoradID(+content);
+        setNoradID(content);
       }
     },
     [lastAdded],
   );
 
   const handleClick = useCallback(
-    (noradID: number) => {
+    (noradID: string) => {
       if (!message.error) {
         setLastAdded(noradID);
         setInputContent('');

@@ -1,8 +1,8 @@
 import axios from 'axios';
-import type { PostSatelliteResponse } from '../Types/satellite';
+import type { PostSatelliteResponse } from '../Types/satellite.ts';
 
 export const postSatellite = (
-  noradID: number,
+  noradID: string,
 ): Promise<PostSatelliteResponse> =>
   axios
     .post(`http://localhost:5001/add_sat`, { noradID: noradID })
