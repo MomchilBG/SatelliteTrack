@@ -122,7 +122,7 @@ const GetData = () => {
       try {
         const addedTLE = (await postSatellite(noradID)).satellite;
         if (addedTLE === null) {
-          setPostError('Invalid Norad ID or satellite is no longer in orbit!');
+          setPostError(`No GP data available for ID ${noradID}`);
           return 'failed';
         } else {
           setPostError('');
