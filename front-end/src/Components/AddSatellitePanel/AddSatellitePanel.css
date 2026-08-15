@@ -58,6 +58,10 @@
   background-color: #ffffff3c;
 }
 
+#norad-id-loading {
+  font-size: 18px;
+}
+
 #norad-id-input-error {
   color: red;
   font-size: 18px;

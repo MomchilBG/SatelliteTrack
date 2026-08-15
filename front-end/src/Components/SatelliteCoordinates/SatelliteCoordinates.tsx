@@ -42,6 +42,7 @@ const GetData = () => {
     })),
   );
   const [addedSatellite, setAddedSatellite] = useState<Satellite[]>([]);
+  const [postError, setPostError] = useState('');
   const [locations, setLocations] = useState(
     TLEs[0].loaded
       ? TLEs.map((TLE) => ({
@@ -131,25 +132,33 @@ const GetData = () => {
   const handlePost = async (noradID: string) => {
     try {
       const addedTLE = (await postSatellite(noradID)).satellite;
-      const addedSatellite: Satellite = {
-        ...addedTLE,
-        key: addedTLE.name.split(' ')[0].toLowerCase(),
-        loaded: true,
-        visible: true,
-      };
-      setAddedSatellite([addedSatellite]);
-      setLocations([
-        ...locations,
-        {
-          location: convertTLEtoCoords(
-            addedSatellite.line1,
-            addedSatellite.line2,
-          ),
+      if (addedTLE === undefined) {
+        setPostError('Invalid Norad ID or satellite is no longer in orbit!');
+        return 'failed';
+      } else {
+        setPostError('');
+        const addedSatellite: Satellite = {
+          ...addedTLE,
+          key: addedTLE.name.split(' ')[0].toLowerCase(),
           loaded: true,
-        },
-      ]);
+          visible: true,
+        };
+        setAddedSatellite([addedSatellite]);
+        setLocations([
+          ...locations,
+          {
+            location: convertTLEtoCoords(
+              addedSatellite.line1,
+              addedSatellite.line2,
+            ),
+            loaded: true,
+          },
+        ]);
+        return 'successful';
+      }
     } catch (e) {
       console.log(`Error handling post: ${e}`);
+      return 'failed';
     }
   };
 
@@ -164,7 +173,13 @@ const GetData = () => {
             View Info
           </button>
         </div>
-        {menu === 'addSat' && <AddSatellitePanel handlePost={handlePost} />}
+        {menu === 'addSat' && (
+          <AddSatellitePanel
+            handlePost={handlePost}
+            postError={postError}
+            setPostError={setPostError}
+          />
+        )}
         {menu === 'info' && (
           <div id="data">
             {[...TLEs, ...addedSatellite].map((satellite, i) => (
