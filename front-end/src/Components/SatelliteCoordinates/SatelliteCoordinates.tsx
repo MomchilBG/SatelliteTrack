@@ -132,7 +132,7 @@ const GetData = () => {
   const handlePost = async (noradID: string) => {
     try {
       const addedTLE = (await postSatellite(noradID)).satellite;
-      if (addedTLE === undefined) {
+      if (addedTLE === null) {
         setPostError('Invalid Norad ID or satellite is no longer in orbit!');
         return 'failed';
       } else {

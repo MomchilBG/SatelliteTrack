@@ -1,19 +1,19 @@
 import { fetchSatelliteTLE } from './requests.js';
 
 export const splitTLEs = (tles) => {
-  const splitTLEs = tles.join('').split(/\r?\n/);
-  const satellites = [];
-
-  for (let i = 0; i < splitTLEs.length - 1; i += 3) {
-    const satellite = {
-      name: splitTLEs[i].trim(),
-      id: splitTLEs[i + 1].substring(2, 7).trim(),
-      line1: splitTLEs[i + 1].trim(),
-      line2: splitTLEs[i + 2].trim(),
-    };
-
-    satellites.push(satellite);
-  }
+  const satellites = tles.map((tle) => {
+    if (tle !== 'No GP data found') {
+      const splitTLE = tle.split(/\r?\n/);
+      return {
+        name: splitTLE[0].trim(),
+        id: splitTLE[1].substring(2, 7).trim(),
+        line1: splitTLE[1].trim(),
+        line2: splitTLE[2].trim(),
+      };
+    } else {
+      return null;
+    }
+  });
 
   return satellites;
 };
@@ -22,11 +22,15 @@ export const setResponse = (lastUpdated, satellites) => {
   lastUpdated = new Date();
   console.log(
     `Updated data:\n${satellites
-      .map((e) =>
-        Object.entries(e)
-          .map((line) => line.join(': '))
-          .join('\n'),
-      )
+      .map((sat) => {
+        if (sat !== null) {
+          return Object.entries(sat)
+            .map((line) => line.join(': '))
+            .join('\n');
+        } else {
+          return 'No GP data found';
+        }
+      })
       .join(
         '\n\n',
       )}\n\nTLE updated at: ${lastUpdated}\n----------------------------------------------------------------------------\n\n`,
