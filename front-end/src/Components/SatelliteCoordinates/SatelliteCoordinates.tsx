@@ -61,6 +61,7 @@ const GetData = () => {
         ],
   );
   const [display, setDisplay] = useState({ 0: 'none', 1: 'none', 2: 'none' });
+  const [menu, setMenu] = useState<'info' | 'addSat'>('info');
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -154,26 +155,39 @@ const GetData = () => {
 
   return TLEs[0].loaded && locations[0].loaded ? (
     <div id="app">
-      <AddSatellitePanel handlePost={handlePost} />
-      <div id="data">
-        {[...TLEs, ...addedSatellite].map((satellite, i) => (
-          <div className="satellite-data-panel-item" key={i}>
-            <SatVisibilityToggle
-              onClick={toggleVisibility}
-              satellite={satellite}
-            />
-            <CollapsableInfo
-              colorsKey={satellite.name.split(' ')[0].toLowerCase()}
-              title={satellite.name}
-              props={{ satellite: { ...satellite, ...locations[i] } }}
-              Comp={TrackingInfoPanel}
-              id={i}
-              onClick={expandInfo}
-              display={display[i as keyof typeof display]}
-            />
+      <div id="menu">
+        <div id="menu-nav">
+          <button className="menu-nav-button" onClick={() => setMenu('addSat')}>
+            Add Satellite
+          </button>
+          <button className="menu-nav-button" onClick={() => setMenu('info')}>
+            View Info
+          </button>
+        </div>
+        {menu === 'addSat' && <AddSatellitePanel handlePost={handlePost} />}
+        {menu === 'info' && (
+          <div id="data">
+            {[...TLEs, ...addedSatellite].map((satellite, i) => (
+              <div className="satellite-data-panel-item" key={i}>
+                <SatVisibilityToggle
+                  onClick={toggleVisibility}
+                  satellite={satellite}
+                />
+                <CollapsableInfo
+                  colorsKey={satellite.name.split(' ')[0].toLowerCase()}
+                  title={satellite.name}
+                  props={{ satellite: { ...satellite, ...locations[i] } }}
+                  Comp={TrackingInfoPanel}
+                  id={i}
+                  onClick={expandInfo}
+                  display={display[i as keyof typeof display]}
+                />
+              </div>
+            ))}
           </div>
-        ))}
+        )}
       </div>
+
       <div id="map-info">
         <LeafletMap
           satellites={[...TLEs, ...addedSatellite].reduce(
