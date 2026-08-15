@@ -106,13 +106,15 @@ const AddSatellitePanel = ({
           Add
         </button>
       </div>
-      {loading && <p id="norad-id-loading">Loading...</p>}
-      {(message.error || postError.length > 0) && (
-        <p id="norad-id-input-error">
-          {message.error ? message.content : postError}
-        </p>
-      )}
-      {message.success && <p id="norad-id-success">{message.content}</p>}
+      <div id="norad-id-messages">
+        {loading && <p id="norad-id-loading">Loading...</p>}
+        {(message.error || postError.length > 0) && (
+          <p id="norad-id-input-error">
+            {message.error ? message.content : postError}
+          </p>
+        )}
+        {message.success && <p id="norad-id-success">{message.content}</p>}
+      </div>
     </div>
   );
 };

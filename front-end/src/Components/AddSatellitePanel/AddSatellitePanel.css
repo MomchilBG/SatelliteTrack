@@ -58,16 +58,20 @@
   background-color: #ffffff3c;
 }
 
-#norad-id-loading {
+#norad-id-messages {
+  width: 90%;
+}
+
+#norad-id-messages > p {
   font-size: 18px;
+  width: 100%;
+  text-align: center;
 }
 
 #norad-id-input-error {
   color: red;
-  font-size: 18px;
 }
 
 #norad-id-success {
   color: green;
-  font-size: 18px;
 }
