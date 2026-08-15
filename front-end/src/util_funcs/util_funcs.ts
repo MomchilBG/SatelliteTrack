@@ -55,7 +55,7 @@ export const getSatellitePath = (line1: string, line2: string) => {
   let condition = true;
   let markerIndex = 0;
 
-  while (condition) {
+  while (condition && markerIndex < 1000) {
     const currentTime = new Date();
     const prevCoord =
       coordinatesUpToTheAntimeridian[
@@ -76,12 +76,12 @@ export const getSatellitePath = (line1: string, line2: string) => {
     );
 
     if (
-      coordinatesUpToTheAntimeridian.length > 1000 ||
-      (markersCoordinates.length > 0 &&
+      (markersCoordinates.length === 1 &&
         ((markersCoordinates[0][0][1] < degreesLong &&
           markersCoordinates[0][0][1] > prevCoord[1]) ||
           (markersCoordinates[0][0][1] > degreesLong &&
-            markersCoordinates[0][0][1] < prevCoord[1])))
+            markersCoordinates[0][0][1] < prevCoord[1]))) ||
+      markersCoordinates.length > 1
     ) {
       condition = false;
     } else {
