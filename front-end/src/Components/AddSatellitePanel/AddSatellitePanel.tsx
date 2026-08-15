@@ -9,8 +9,9 @@ const AddSatellitePanel = ({
 }) => {
   const [inputContent, setInputContent] = useState('');
   const [noradID, setNoradID] = useState(0);
-  const [error, setError] = useState({
-    state: false,
+  const [message, setMessage] = useState({
+    success: false,
+    error: false,
     content: '',
   });
   const [lastAdded, setLastAdded] = useState(0);
@@ -21,23 +22,32 @@ const AddSatellitePanel = ({
       const content = input.value;
 
       if (content.length === 0) {
-        setError({ state: false, content: '' });
+        setMessage({ success: false, error: false, content: '' });
       } else if (
         typeof +content !== 'number' ||
         Number.isNaN(+content) ||
         +content <= 0
       ) {
-        setError({ state: true, content: 'Please type a valid NoradID!' });
+        setMessage({
+          success: false,
+          error: true,
+          content: 'Please type a valid NoradID!',
+        });
       } else if (
         +content === lastAdded ||
         Object.values(defaultNoradIDs).some((id) => +content === id)
       ) {
-        setError({
-          state: true,
+        setMessage({
+          success: false,
+          error: true,
           content: 'This satellite is already being tracked!',
         });
       } else {
-        setError({ state: false, content: '' });
+        setMessage({
+          success: false,
+          error: false,
+          content: '',
+        });
         setNoradID(+content);
       }
     },
@@ -46,13 +56,18 @@ const AddSatellitePanel = ({
 
   const handleClick = useCallback(
     (noradID: number) => {
-      if (!error.state && noradID !== lastAdded) {
+      if (!message.error) {
         setLastAdded(noradID);
         setInputContent('');
         handlePost(noradID);
+        setMessage({
+          success: true,
+          error: false,
+          content: `Successfully added satellite with Norad ID ${noradID}`,
+        });
       }
     },
-    [error, lastAdded, handlePost],
+    [message, handlePost],
   );
 
   return (
@@ -63,16 +78,18 @@ const AddSatellitePanel = ({
           id="norad-id-input"
           onChange={(event) => handleChange(event.currentTarget)}
           value={inputContent}
-          placeholder=""
+          placeholder="Norad ID..."
         />
         <button
+          id="add-satellite-button"
           onClick={() => handleClick(noradID)}
-          disabled={error.state || inputContent.length === 0}
+          disabled={message.error || inputContent.length === 0}
         >
-          Add Satellite
+          Add
         </button>
       </div>
-      {error.state && <p id="norad-id-input-error">{error.content}</p>}
+      {message.error && <p id="norad-id-input-error">{message.content}</p>}
+      {message.success && <p id="norad-id-success">{message.content}</p>}
     </div>
   );
 };

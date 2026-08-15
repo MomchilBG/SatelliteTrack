@@ -1,0 +1,69 @@
+#add-satellite-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: scroll;
+  overscroll-behavior-y: contain;
+  width: 100%;
+  height: 100%;
+}
+
+#add-satellite-panel > div {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+  width: 90%;
+  height: 3rem;
+}
+
+#norad-id-input {
+  font-family: monospace;
+  height: 100%;
+  padding: 0;
+  font-size: 18px;
+  border: none;
+  padding: 0 0.5rem;
+  width: 75%;
+  background-color: rgb(27, 46, 46);
+  transition: background-color 0.3s;
+}
+
+#norad-id-input:focus {
+  outline: none;
+  background-color: rgb(36, 59, 59);
+}
+
+#add-satellite-button {
+  font-family: monospace;
+  height: 100%;
+  padding: 0;
+  font-size: 18px;
+  border: none;
+  padding: 0 0.5rem;
+  width: 20%;
+  color: white;
+  background-color: rgb(27, 46, 46);
+  position: relative;
+}
+
+#add-satellite-button:hover:after {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  cursor: pointer;
+  background-color: #ffffff3c;
+}
+
+#norad-id-input-error {
+  color: red;
+  font-size: 18px;
+}
+
+#norad-id-success {
+  color: green;
+  font-size: 18px;
+}

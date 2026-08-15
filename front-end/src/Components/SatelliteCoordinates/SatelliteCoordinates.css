@@ -21,6 +21,7 @@
   flex-direction: column;
   width: 20vw;
   height: 64vh;
+  border-right: 3px solid gray;
 }
 
 #menu-nav {
@@ -41,7 +42,7 @@
 }
 
 .menu-nav-button:last-child {
-  border-right: 2px solid gray;
+  border-right: none;
   border-left: 1px solid gray;
 }
 
