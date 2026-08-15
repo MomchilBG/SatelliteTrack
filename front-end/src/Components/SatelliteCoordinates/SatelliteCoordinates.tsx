@@ -8,7 +8,6 @@ import {
   getSatellitePath,
 } from '../../util_funcs/util_funcs.ts';
 import CollapsableInfo from '../CollaspableInfo/CollapsableInfo.tsx';
-import TrackingInfoPanel from '../TrackingInfoPanel/TrackingInfoPanel.tsx';
 import type { fetchedTLEs, Satellite } from '../../Types/satellite.ts';
 import SatVisibilityToggle from '../SatVisibilityToggle/SatVisibilityToggle.tsx';
 import AddSatellitePanel from '../AddSatellitePanel/AddSatellitePanel.tsx';
@@ -61,7 +60,6 @@ const GetData = () => {
           },
         ],
   );
-  const [display, setDisplay] = useState({ 0: 'none', 1: 'none', 2: 'none' });
   const [menu, setMenu] = useState<'info' | 'addSat'>('info');
 
   useEffect(() => {
@@ -104,16 +102,6 @@ const GetData = () => {
     return () => clearInterval(interval);
   }, [TLEs, addedSatellite]);
 
-  const expandInfo = useCallback(
-    (id: number) => {
-      const copy = { ...display };
-      copy[id as keyof typeof copy] =
-        copy[id as keyof typeof copy] === 'none' ? 'block' : 'none';
-      setDisplay({ ...copy });
-    },
-    [display],
-  );
-
   const toggleVisibility = useCallback(
     (satellite: Satellite, element: HTMLButtonElement) => {
       if (satellite.visible === true) {
@@ -129,38 +117,41 @@ const GetData = () => {
     [],
   );
 
-  const handlePost = async (noradID: string) => {
-    try {
-      const addedTLE = (await postSatellite(noradID)).satellite;
-      if (addedTLE === null) {
-        setPostError('Invalid Norad ID or satellite is no longer in orbit!');
-        return 'failed';
-      } else {
-        setPostError('');
-        const addedSatellite: Satellite = {
-          ...addedTLE,
-          key: addedTLE.name.split(' ')[0].toLowerCase(),
-          loaded: true,
-          visible: true,
-        };
-        setAddedSatellite([addedSatellite]);
-        setLocations([
-          ...locations,
-          {
-            location: convertTLEtoCoords(
-              addedSatellite.line1,
-              addedSatellite.line2,
-            ),
+  const handlePost = useCallback(
+    async (noradID: string) => {
+      try {
+        const addedTLE = (await postSatellite(noradID)).satellite;
+        if (addedTLE === null) {
+          setPostError('Invalid Norad ID or satellite is no longer in orbit!');
+          return 'failed';
+        } else {
+          setPostError('');
+          const addedSatellite: Satellite = {
+            ...addedTLE,
+            key: addedTLE.name.split(' ')[0].toLowerCase(),
             loaded: true,
-          },
-        ]);
-        return 'successful';
+            visible: true,
+          };
+          setAddedSatellite([addedSatellite]);
+          setLocations([
+            ...locations,
+            {
+              location: convertTLEtoCoords(
+                addedSatellite.line1,
+                addedSatellite.line2,
+              ),
+              loaded: true,
+            },
+          ]);
+          return 'successful';
+        }
+      } catch (e) {
+        console.log(`Error handling post: ${e}`);
+        return 'failed';
       }
-    } catch (e) {
-      console.log(`Error handling post: ${e}`);
-      return 'failed';
-    }
-  };
+    },
+    [locations],
+  );
 
   return TLEs[0].loaded && locations[0].loaded ? (
     <div id="app">
@@ -191,11 +182,7 @@ const GetData = () => {
                 <CollapsableInfo
                   colorsKey={satellite.name.split(' ')[0].toLowerCase()}
                   title={satellite.name}
-                  props={{ satellite: { ...satellite, ...locations[i] } }}
-                  Comp={TrackingInfoPanel}
-                  id={i}
-                  onClick={expandInfo}
-                  display={display[i as keyof typeof display]}
+                  satellite={{ ...satellite, ...locations[i] }}
                 />
               </div>
             ))}

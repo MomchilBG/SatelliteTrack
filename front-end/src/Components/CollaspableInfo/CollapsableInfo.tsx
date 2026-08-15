@@ -1,42 +1,35 @@
 import type { SatelliteInfo } from '../../Types/satellite.ts';
 import { colors } from '../../constants.tsx';
 import './CollapsableInfo.css';
-import React from 'react';
+import TrackingInfoPanel from '../TrackingInfoPanel/TrackingInfoPanel.tsx';
+import { useState } from 'react';
 
 const CollapsableInfo = ({
   colorsKey,
   title,
-  props,
-  id,
-  Comp,
-  onClick,
-  display,
+  satellite,
 }: {
   colorsKey: string;
   title: string;
-  props: { satellite: SatelliteInfo };
-  id: number;
-  Comp: React.ComponentType<{
-    satellite: SatelliteInfo;
-    colorsKey: string;
-    display: string;
-  }>;
-  onClick: (id: number) => void;
-  display: string;
+  satellite: SatelliteInfo;
 }) => {
+  const [display, setDisplay] = useState<'none' | 'block'>('none');
+
   return (
     <>
       <button
-        onClick={() => onClick(id)}
+        onClick={() => setDisplay(display === 'none' ? 'block' : 'none')}
         className="collapsable-info-toggle"
-        key={`collapsable-info-${id}`}
+        key={`collapsable-info-${title}`}
         style={{
           backgroundColor: `rgba(${colors[colorsKey as keyof typeof colors] || colors.otherSat}, 0.45)`,
         }}
       >
         {title}
       </button>
-      <Comp {...{ ...props, colorsKey: colorsKey, display: display }} />
+      <TrackingInfoPanel
+        {...{ satellite, colorsKey: colorsKey, display: display }}
+      />
     </>
   );
 };
