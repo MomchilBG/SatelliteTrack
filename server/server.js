@@ -13,6 +13,7 @@ let tles = await getData(Object.values(DEF_NORAD_IDS));
 let satellites = splitTLEs(tles);
 let lastUpdated = null;
 setResponse(lastUpdated, satellites);
+let addedSatellites = {};
 
 //Update TLE data every 2 hours
 setInterval(async () => {
@@ -38,19 +39,41 @@ server.get('/all', (req, res) => {
 });
 
 server.post('/add_sat', async (req, res) => {
-  const noradID = req.body.noradID;
-  const addedTLE = await getData([noradID]);
-
-  if (addedTLE[0].success === false) {
-    res
-      .status(200)
-      .json({ success: false, satellite: null, message: addedTLE[0].contents });
+  const noradID = +req.body.noradID;
+  if (
+    addedSatellites[noradID] &&
+    new Date().valueOf() - addedSatellites[noradID].lastUpdated.valueOf() <
+      7200000
+  ) {
+    res.status(200).json({
+      success: true,
+      satellite: addedSatellites[noradID].satellite,
+      message: '',
+    });
   } else {
-    const addedSatellite = splitTLEs(addedTLE);
-    setResponse(lastUpdated, addedSatellite);
-    res
-      .status(200)
-      .json({ success: true, satellite: addedSatellite[0], message: '' });
+    const addedTLE = await getData([noradID]);
+
+    if (addedTLE[0].success === false) {
+      res.status(200).json({
+        success: false,
+        satellite: null,
+        message: addedTLE[0].contents,
+      });
+    } else {
+      const addedSatellite = splitTLEs(addedTLE);
+      addedSatellites = {
+        ...addedSatellites,
+        [+addedSatellite[0].id]: {
+          satellite: addedSatellite[0],
+          lastUpdated: new Date(),
+        },
+      };
+      console.log(addedSatellites);
+      setResponse(new Date(), addedSatellite);
+      res
+        .status(200)
+        .json({ success: true, satellite: addedSatellite[0], message: '' });
+    }
   }
 });
 
