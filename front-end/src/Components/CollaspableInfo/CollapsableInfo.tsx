@@ -22,7 +22,7 @@ const CollapsableInfo = ({
         className="collapsable-info-toggle"
         key={`collapsable-info-${title}`}
         style={{
-          backgroundColor: `rgba(${colors[colorsKey as keyof typeof colors] || colors.otherSat}, 0.45)`,
+          backgroundColor: `rgba(${colors[colorsKey as keyof typeof colors]}, 0.45)`,
         }}
       >
         {title}

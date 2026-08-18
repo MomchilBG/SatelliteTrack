@@ -16,7 +16,7 @@ const TrackingInfoPanel = ({
       key={`tracking-info-${colorsKey}`}
       className="tracking-info"
       style={{
-        backgroundColor: `rgba(${colors[colorsKey as keyof typeof colors] || colors.otherSat}, 0.35)`,
+        backgroundColor: `rgba(${colors[colorsKey as keyof typeof colors]}, 0.35)`,
         display: display,
       }}
     >

@@ -103,7 +103,7 @@ const LeafletMap = ({
             key={`path-${satellite.key}`}
             // @ts-expect-error uwu
             positions={satellite.path}
-            color={`rgb(${colors[satellite.key as keyof typeof colors] || colors.otherSat})`}
+            color={`rgb(${colors[satellite.key as keyof typeof colors]})`}
             weight={2}
           />
         </Fragment>
