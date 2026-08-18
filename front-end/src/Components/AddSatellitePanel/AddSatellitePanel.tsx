@@ -6,18 +6,28 @@ const AddSatellitePanel = ({
   handlePost,
   postError,
   setPostError,
+  numOfAddedSats,
 }: {
   handlePost: (noradID: string) => Promise<'failed' | 'successful'>;
   postError: string;
   setPostError: (postError: string) => void;
+  numOfAddedSats: number;
 }) => {
   const [inputContent, setInputContent] = useState('');
   const [noradID, setNoradID] = useState('0');
-  const [message, setMessage] = useState({
-    success: false,
-    error: false,
-    content: '',
-  });
+  const [message, setMessage] = useState(
+    numOfAddedSats >= 5
+      ? {
+          success: false,
+          error: true,
+          content: 'Maximum satellite count reached!',
+        }
+      : {
+          success: false,
+          error: false,
+          content: '',
+        },
+  );
   const [lastAdded, setLastAdded] = useState('0');
   const [loading, setLoading] = useState(false);
 
