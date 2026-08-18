@@ -68,7 +68,6 @@ server.post('/add_sat', async (req, res) => {
           lastUpdated: new Date(),
         },
       };
-      console.log(addedSatellites);
       setResponse(new Date(), addedSatellite);
       res
         .status(200)
