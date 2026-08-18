@@ -103,42 +103,44 @@ const GetData = () => {
   }, [TLEs, addedSatellite]);
 
   const toggleVisibility = useCallback(
-    (satellite: Satellite, element: HTMLButtonElement) => {
+    (satellite: Satellite, index: number, element: HTMLButtonElement) => {
+      const TLEsModCopy = [...TLEs];
       if (satellite.visible === true) {
-        satellite.visible = false;
+        TLEsModCopy[index].visible = false;
         element.classList.remove('visible');
         element.classList.add('not-visible');
       } else if (satellite.visible === false) {
-        satellite.visible = true;
+        TLEsModCopy[index].visible = true;
         element.classList.remove('not-visible');
         element.classList.add('visible');
       }
+      setTLEs([...TLEsModCopy]);
     },
-    [],
+    [TLEs],
   );
 
   const handlePost = useCallback(
     async (noradID: string) => {
       try {
-        const addedTLE = (await postSatellite(noradID)).satellite;
-        if (addedTLE === null) {
+        const fetchedTLE = (await postSatellite(noradID)).satellite;
+        if (fetchedTLE === null) {
           setPostError(`No GP data available for ID ${noradID}`);
           return 'failed';
         } else {
           setPostError('');
-          const addedSatellite: Satellite = {
-            ...addedTLE,
-            key: addedTLE.name.split(' ')[0].toLowerCase(),
+          const fetchedSatellite: Satellite = {
+            ...fetchedTLE,
+            key: fetchedTLE.name.split(' ')[0].toLowerCase(),
             loaded: true,
             visible: true,
           };
-          setAddedSatellite([addedSatellite]);
+          setAddedSatellite([...addedSatellite, fetchedSatellite]);
           setLocations([
             ...locations,
             {
               location: convertTLEtoCoords(
-                addedSatellite.line1,
-                addedSatellite.line2,
+                fetchedSatellite.line1,
+                fetchedSatellite.line2,
               ),
               loaded: true,
             },
@@ -150,7 +152,7 @@ const GetData = () => {
         return 'failed';
       }
     },
-    [locations],
+    [locations, addedSatellite],
   );
 
   return TLEs[0].loaded && locations[0].loaded ? (
@@ -177,6 +179,7 @@ const GetData = () => {
               <div className="satellite-data-panel-item" key={i}>
                 <SatVisibilityToggle
                   onClick={toggleVisibility}
+                  index={i}
                   satellite={satellite}
                 />
                 <CollapsableInfo

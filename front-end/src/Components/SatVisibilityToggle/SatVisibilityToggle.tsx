@@ -4,13 +4,19 @@ import './SatVisibilityToggle.css';
 const SatVisibilityToggle = ({
   onClick,
   satellite,
+  index,
 }: {
-  onClick: (satellite: Satellite, element: HTMLButtonElement) => void;
+  onClick: (
+    satellite: Satellite,
+    index: number,
+    element: HTMLButtonElement,
+  ) => void;
   satellite: Satellite;
+  index: number;
 }) => {
   return (
     <button
-      onClick={(event) => onClick(satellite, event?.currentTarget)}
+      onClick={(event) => onClick(satellite, index, event?.currentTarget)}
       className="visibility-toggle visible"
     />
   );
