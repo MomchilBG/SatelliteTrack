@@ -6,7 +6,11 @@ export const colors = {
   iss: '0, 0, 255',
   hst: '255, 0, 0',
   css: '0, 255, 0',
-  otherSat: '130, 0, 140',
+  addedSat_0: '150, 75, 0',
+  addedSat_1: '0, 140, 140',
+  addedSat_2: '130, 0, 140',
+  addedSat_3: '90, 90, 90',
+  addedSat_4: '255, 210, 220',
   satelliteTrack: '255, 166, 0',
   aboutMe: '192, 0, 192',
 };
