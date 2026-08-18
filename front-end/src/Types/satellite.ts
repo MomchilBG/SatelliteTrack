@@ -34,4 +34,5 @@ export type SatelliteInfo = {
 export type PostSatelliteResponse = {
   success: boolean;
   satellite: fetchedTLEs;
+  message: string;
 };
