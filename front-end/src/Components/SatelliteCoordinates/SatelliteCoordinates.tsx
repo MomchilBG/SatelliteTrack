@@ -12,10 +12,12 @@ import type { fetchedTLEs, Satellite } from '../../Types/satellite.ts';
 import SatVisibilityToggle from '../SatVisibilityToggle/SatVisibilityToggle.tsx';
 import AddSatellitePanel from '../AddSatellitePanel/AddSatellitePanel.tsx';
 
-const initialFetch: fetchedTLEs[] = await fetchData('all')
-  .then((response) => (Array.isArray(response) ? response : [response]))
-  .catch((error) => {
-    console.log(error);
+const initialFetch: fetchedTLEs[] = await (async () => {
+  try {
+    const response = fetchData('all');
+    return response;
+  } catch (e) {
+    console.log(e);
     return [
       {
         name: '',
@@ -26,7 +28,8 @@ const initialFetch: fetchedTLEs[] = await fetchData('all')
         PERIOD_BETWEEN_POINTS: 0,
       },
     ];
-  });
+  }
+})();
 
 const GetData = () => {
   const [TLEs, setTLEs] = useState<Satellite[]>(
@@ -66,9 +69,8 @@ const GetData = () => {
     const interval = setInterval(() => {
       fetchData('all')
         .then((response) => {
-          const fetchedTLEs = Array.isArray(response) ? response : [response];
           setTLEs(
-            fetchedTLEs.map((TLE, i) => ({
+            response.map((TLE, i) => ({
               name: TLE.name,
               id: TLE.id,
               line1: TLE.line1,
@@ -142,7 +144,7 @@ const GetData = () => {
         } else {
           setPostError('');
           const fetchedSatellite: Satellite = {
-            ...response.satellite,
+            ...response.satellite[0],
             key: `addedSat_${addedSatellites.length}`,
             loaded: true,
             visible: true,

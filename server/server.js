@@ -23,15 +23,15 @@ setInterval(async () => {
 }, 7200000);
 
 server.get('/iss', (req, res) => {
-  res.status(200).json(satellites[0]);
+  res.status(200).json([satellites[0]]);
 });
 
 server.get('/hubble', (req, res) => {
-  res.status(200).json(satellites[1]);
+  res.status(200).json([satellites[1]]);
 });
 
 server.get('/css', (req, res) => {
-  res.status(200).json(satellites[2]);
+  res.status(200).json([satellites[2]]);
 });
 
 server.get('/all', (req, res) => {
@@ -64,14 +64,14 @@ server.post('/add_sat', async (req, res) => {
       addedSatellites = {
         ...addedSatellites,
         [+addedSatellite[0].id]: {
-          satellite: addedSatellite[0],
+          satellite: addedSatellite,
           lastUpdated: new Date(),
         },
       };
       setResponse(new Date(), addedSatellite);
       res
         .status(200)
-        .json({ success: true, satellite: addedSatellite[0], message: '' });
+        .json({ success: true, satellite: addedSatellite, message: '' });
     }
   }
 });
