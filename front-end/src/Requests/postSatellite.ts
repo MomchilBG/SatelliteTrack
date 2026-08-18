@@ -17,5 +17,6 @@ export const postSatellite = (
           line1: '',
           line2: '',
         },
+        message: '',
       };
     });
