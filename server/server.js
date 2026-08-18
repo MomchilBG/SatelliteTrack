@@ -39,14 +39,19 @@ server.get('/all', (req, res) => {
 
 server.post('/add_sat', async (req, res) => {
   const noradID = req.body.noradID;
-
   const addedTLE = await getData([noradID]);
 
-  const addedSatellite = splitTLEs(addedTLE);
-
-  setResponse(lastUpdated, addedSatellite);
-
-  res.status(200).json({ success: true, satellite: addedSatellite[0] });
+  if (addedTLE[0].success === false) {
+    res
+      .status(200)
+      .json({ success: false, satellite: null, message: addedTLE[0].contents });
+  } else {
+    const addedSatellite = splitTLEs(addedTLE);
+    setResponse(lastUpdated, addedSatellite);
+    res
+      .status(200)
+      .json({ success: true, satellite: addedSatellite[0], message: '' });
+  }
 });
 
 server.listen(port, () => {

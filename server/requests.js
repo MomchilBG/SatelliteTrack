@@ -4,8 +4,13 @@ export const fetchSatelliteTLE = async (norad_id) => {
       `https://celestrak.org/NORAD/elements/gp.php?CATNR=${norad_id}&FORMAT=TLE`,
     ).then((res) => res.text());
 
-    return tle;
+    if (tle === 'No GP data found') {
+      throw new Error('No GP data found');
+    }
+
+    return { success: true, contents: tle };
   } catch (e) {
     console.log(e.message);
+    return { success: false, contents: e.message };
   }
 };
