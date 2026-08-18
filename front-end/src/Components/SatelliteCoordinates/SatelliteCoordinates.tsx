@@ -40,11 +40,11 @@ const GetData = () => {
       visible: true,
     })),
   );
-  const [addedSatellite, setAddedSatellite] = useState<Satellite[]>([]);
+  const [addedSatellites, setAddedSatellites] = useState<Satellite[]>([]);
   const [postError, setPostError] = useState('');
   const [locations, setLocations] = useState(
     TLEs[0].loaded
-      ? TLEs.map((TLE) => ({
+      ? [...TLEs, ...addedSatellites].map((TLE) => ({
           location: convertTLEtoCoords(TLE.line1, TLE.line2),
           loaded: true,
         }))
@@ -91,7 +91,7 @@ const GetData = () => {
     const interval = setInterval(() => {
       if (TLEs[0].loaded) {
         setLocations(
-          [...TLEs, ...addedSatellite].map((TLE) => ({
+          [...TLEs, ...addedSatellites].map((TLE) => ({
             location: convertTLEtoCoords(TLE.line1, TLE.line2),
             loaded: true,
           })),
@@ -100,41 +100,54 @@ const GetData = () => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [TLEs, addedSatellite]);
+  }, [TLEs, addedSatellites]);
 
   const toggleVisibility = useCallback(
     (satellite: Satellite, index: number, element: HTMLButtonElement) => {
-      const TLEsModCopy = [...TLEs];
+      let TLEsModCopy;
+      let modIndex;
+      if (index > TLEs.length - 1) {
+        TLEsModCopy = [...addedSatellites];
+        modIndex = index - TLEs.length;
+      } else {
+        TLEsModCopy = [...TLEs];
+        modIndex = index;
+      }
       if (satellite.visible === true) {
-        TLEsModCopy[index].visible = false;
+        TLEsModCopy[modIndex].visible = false;
         element.classList.remove('visible');
         element.classList.add('not-visible');
       } else if (satellite.visible === false) {
-        TLEsModCopy[index].visible = true;
+        TLEsModCopy[modIndex].visible = true;
         element.classList.remove('not-visible');
         element.classList.add('visible');
       }
-      setTLEs([...TLEsModCopy]);
+
+      if (index > TLEs.length - 1) {
+        setAddedSatellites(TLEsModCopy);
+      } else {
+        setTLEs(TLEsModCopy);
+      }
     },
-    [TLEs],
+    [TLEs, addedSatellites],
   );
 
   const handlePost = useCallback(
     async (noradID: string) => {
       try {
-        const fetchedTLE = (await postSatellite(noradID)).satellite;
-        if (fetchedTLE === null) {
-          setPostError(`No GP data available for ID ${noradID}`);
+        const response = await postSatellite(noradID);
+        if (response.success === false) {
+          setPostError(`${response.message} for Norad ID ${noradID}`);
           return 'failed';
         } else {
           setPostError('');
           const fetchedSatellite: Satellite = {
-            ...fetchedTLE,
-            key: fetchedTLE.name.split(' ')[0].toLowerCase(),
+            ...response.satellite,
+            key: `addedSat_${addedSatellites.length}`,
             loaded: true,
             visible: true,
           };
-          setAddedSatellite([...addedSatellite, fetchedSatellite]);
+          setAddedSatellites([...addedSatellites, fetchedSatellite]);
           setLocations([
             ...locations,
             {
@@ -152,7 +165,7 @@ const GetData = () => {
         return 'failed';
       }
     },
-    [locations, addedSatellite],
+    [locations, addedSatellites],
   );
 
   return TLEs[0].loaded && locations[0].loaded ? (
@@ -171,11 +184,12 @@ const GetData = () => {
             handlePost={handlePost}
             postError={postError}
             setPostError={setPostError}
+            numOfAddedSats={addedSatellites.length}
           />
         )}
         {menu === 'info' && (
           <div id="data">
-            {[...TLEs, ...addedSatellite].map((satellite, i) => (
+            {[...TLEs, ...addedSatellites].map((satellite, i) => (
               <div className="satellite-data-panel-item" key={i}>
                 <SatVisibilityToggle
                   onClick={toggleVisibility}
@@ -183,7 +197,7 @@ const GetData = () => {
                   satellite={satellite}
                 />
                 <CollapsableInfo
-                  colorsKey={satellite.name.split(' ')[0].toLowerCase()}
+                  colorsKey={satellite.key}
                   title={satellite.name}
                   satellite={{ ...satellite, ...locations[i] }}
                 />
@@ -195,7 +209,7 @@ const GetData = () => {
 
       <div id="map-info">
         <LeafletMap
-          satellites={[...TLEs, ...addedSatellite].reduce(
+          satellites={[...TLEs, ...addedSatellites].reduce(
             (
               prev: {
                 key: string;
