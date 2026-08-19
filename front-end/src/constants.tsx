@@ -2,7 +2,7 @@ import type { AboutInfo } from './Types/about_info.ts';
 
 export const periodInSec = 15;
 
-export const colors = {
+export const colors = Object.freeze({
   iss: '0, 0, 255',
   hst: '255, 0, 0',
   css: '0, 255, 0',
@@ -13,7 +13,7 @@ export const colors = {
   addedSat_4: '255, 20, 150',
   satelliteTrack: '255, 166, 0',
   aboutMe: '192, 0, 192',
-};
+});
 
 export const defaultNoradIDs = Object.freeze({
   ISS: 25544,
