@@ -8,36 +8,40 @@ import {
   getSatellitePath,
 } from '../../util_funcs/util_funcs.ts';
 import CollapsableInfo from '../CollaspableInfo/CollapsableInfo.tsx';
-import type { fetchedTLEs, Satellite } from '../../Types/satellite.ts';
+import type { APIResponse, Satellite } from '../../Types/satellite.ts';
 import SatVisibilityToggle from '../SatVisibilityToggle/SatVisibilityToggle.tsx';
 import AddSatellitePanel from '../AddSatellitePanel/AddSatellitePanel.tsx';
 
-const initialFetch: fetchedTLEs[] = await (async () => {
+const initialFetch: APIResponse = await (async () => {
   try {
-    const response = fetchData('all');
+    const response = fetchData('defaults');
     return response;
   } catch (e) {
     console.log(e);
-    return [
-      {
-        name: '',
-        id: '',
-        line1: '',
-        line2: '',
-        ORBIT_POINTS: 0,
-        PERIOD_BETWEEN_POINTS: 0,
-      },
-    ];
+    return {
+      success: false,
+      satellites: [
+        {
+          name: '',
+          id: '',
+          line1: '',
+          line2: '',
+          lastUpdated: new Date(),
+        },
+      ],
+      message: '',
+    };
   }
 })();
 
 const GetData = () => {
   const [TLEs, setTLEs] = useState<Satellite[]>(
-    initialFetch.map((TLE) => ({
+    initialFetch.satellites.map((TLE) => ({
       name: TLE.name,
       id: TLE.id,
       line1: TLE.line1,
       line2: TLE.line2,
+      lastUpdated: TLE.lastUpdated,
       key: TLE.name.split(' ')[0].toLowerCase(),
       loaded: TLE.line1 === '' ? false : true,
       visible: true,
@@ -67,14 +71,15 @@ const GetData = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      fetchData('all')
+      fetchData('defaults')
         .then((response) => {
           setTLEs(
-            response.map((TLE, i) => ({
+            response.satellites.map((TLE, i) => ({
               name: TLE.name,
               id: TLE.id,
               line1: TLE.line1,
               line2: TLE.line2,
+              lastUpdated: TLE.lastUpdated,
               key: i < TLEs.length ? TLEs[i].key : '',
               loaded: true,
               visible: i < TLEs.length ? TLEs[i].visible : true,
@@ -144,7 +149,7 @@ const GetData = () => {
         } else {
           setPostError('');
           const fetchedSatellite: Satellite = {
-            ...response.satellite[0],
+            ...response.satellites[0],
             key: `addedSat_${addedSatellites.length}`,
             loaded: true,
             visible: true,
