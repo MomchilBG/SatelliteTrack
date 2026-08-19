@@ -112,6 +112,9 @@ const AddSatellitePanel = ({
           id="add-satellite-button"
           onClick={() => handleClick(noradID)}
           disabled={message.error || inputContent.length === 0}
+          className={
+            message.error || inputContent.length === 0 ? 'disable' : ''
+          }
         >
           Add
         </button>
