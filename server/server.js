@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import { getData, splitTLEs, setResponse } from './util_funcs.js';
+import { updateTLE } from './util_funcs.js';
 import { DEF_NORAD_IDS } from './constants.js';
 
 const port = 5001;
@@ -8,71 +8,151 @@ const server = express();
 server.use(cors());
 server.use(express.json());
 
-//Initial fetch to set the data
-let tles = await getData(Object.values(DEF_NORAD_IDS));
-let satellites = splitTLEs(tles);
-let lastUpdated = null;
-setResponse(lastUpdated, satellites);
-let addedSatellites = {};
+let satellites = {};
+(async () => {
+  try {
+    const [initSats, initTLEs] = await updateTLE(
+      Object.values(DEF_NORAD_IDS),
+      satellites,
+    );
+    satellites = initSats;
+  } catch (e) {
+    console.log(`Error occured during init: ${e.message}`);
+  }
+})();
 
-//Update TLE data every 2 hours
-setInterval(async () => {
-  tles = await getData(Object.values(DEF_NORAD_IDS));
-  satellites = splitTLEs(tles);
-  setResponse(lastUpdated, satellites);
-}, 7200000);
-
-server.get('/iss', (req, res) => {
-  res.status(200).json([satellites[0]]);
+server.get('/iss', async (req, res) => {
+  try {
+    const [sats, ISSTLE] = await updateTLE([DEF_NORAD_IDS.ISS], satellites);
+    satellites = sats;
+    if (ISSTLE !== null && ISSTLE[0].success === false) {
+      res.status(200).json({
+        success: false,
+        satellites: null,
+        message: ISSTLE[0].contents,
+      });
+    }
+    res.status(200).json({
+      success: true,
+      satellites: [satellites[DEF_NORAD_IDS.ISS]],
+      message: '',
+    });
+  } catch (e) {
+    console.log(`Error occuring during iss fetch: ${e.message}`);
+    res.status(200).json({
+      success: false,
+      satellites: null,
+      message: 'TLE fetching for the ISS failed',
+    });
+  }
 });
 
-server.get('/hubble', (req, res) => {
-  res.status(200).json([satellites[1]]);
+server.get('/hubble', async (req, res) => {
+  try {
+    const [sats, HubbleTLE] = await updateTLE(
+      [DEF_NORAD_IDS.HUBBLE],
+      satellites,
+    );
+    satellites = sats;
+    if (HubbleTLE !== null && HubbleTLE[0].success === false) {
+      res.status(200).json({
+        success: false,
+        satellites: null,
+        message: HubbleTLE[0].contents,
+      });
+    }
+    res.status(200).json({
+      success: true,
+      satellites: [satellites[DEF_NORAD_IDS.HUBBLE]],
+      message: '',
+    });
+  } catch (e) {
+    console.log(`Error occuring during Hubble fetch: ${e.message}`);
+    res.status(200).json({
+      success: false,
+      satellites: null,
+      message: 'TLE fetching for the Hubble failed',
+    });
+  }
 });
 
-server.get('/css', (req, res) => {
-  res.status(200).json([satellites[2]]);
+server.get('/css', async (req, res) => {
+  try {
+    const [sats, CSSTLE] = await updateTLE([DEF_NORAD_IDS.CSS], satellites);
+    satellites = sats;
+    if (CSSTLE !== null && CSSTLE[0].success === false) {
+      res.status(200).json({
+        success: false,
+        satellites: null,
+        message: CSSTLE[0].contents,
+      });
+    }
+    res.status(200).json({
+      success: true,
+      satellites: [satellites[DEF_NORAD_IDS.CSS]],
+      message: '',
+    });
+  } catch (e) {
+    console.log(`Error occuring during CSS fetch: ${e.message}`);
+    res.status(200).json({
+      success: false,
+      satellites: null,
+      message: 'TLE fetching for the CSS failed',
+    });
+  }
 });
 
-server.get('/all', (req, res) => {
-  res.status(200).json(satellites);
+server.get('/defaults', async (req, res) => {
+  try {
+    const [sats, defTLEs] = await updateTLE(
+      Object.values(DEF_NORAD_IDS),
+      satellites,
+    );
+    satellites = sats;
+    res.status(200).json({
+      success: true,
+      satellites: Object.values(DEF_NORAD_IDS).map((id) => satellites[id]),
+      message: '',
+    });
+  } catch (e) {
+    console.log(`Error occured during defaults fetch for ${id}: ${e.message}`);
+    res.status(200).json({
+      success: false,
+      satellites: null,
+      message: 'Default TLE fetching failed',
+    });
+  }
+});
+
+server.get('/noradIDs', (req, res) => {
+  req.query.map((noradID) => {});
 });
 
 server.post('/add_sat', async (req, res) => {
-  const noradID = +req.body.noradID;
-  if (
-    addedSatellites[noradID] &&
-    new Date().valueOf() - addedSatellites[noradID].lastUpdated.valueOf() <
-      7200000
-  ) {
-    res.status(200).json({
-      success: true,
-      satellite: addedSatellites[noradID].satellite,
-      message: '',
-    });
-  } else {
-    const addedTLE = await getData([noradID]);
-
-    if (addedTLE[0].success === false) {
+  try {
+    const noradID = +req.body.noradID;
+    const [updatedSats, updatedTLE] = await updateTLE([noradID], satellites);
+    satellites = updatedSats;
+    if (updatedTLE !== null && updatedTLE[0].success === false) {
       res.status(200).json({
         success: false,
-        satellite: null,
-        message: addedTLE[0].contents,
+        satellites: null,
+        message: updatedTLE[0].contents,
       });
     } else {
-      const addedSatellite = splitTLEs(addedTLE);
-      addedSatellites = {
-        ...addedSatellites,
-        [+addedSatellite[0].id]: {
-          satellite: addedSatellite,
-          lastUpdated: new Date(),
-        },
-      };
-      setResponse(new Date(), addedSatellite);
-      res
-        .status(200)
-        .json({ success: true, satellite: addedSatellite, message: '' });
+      res.status(200).json({
+        success: true,
+        satellites: [satellites[noradID]],
+        message: '',
+      });
     }
+  } catch (e) {
+    console.log(`Post request failed: ${e.message}`);
+    res.status(200).json({
+      success: false,
+      satellites: null,
+      message: 'Post request failed',
+    });
   }
 });
 
