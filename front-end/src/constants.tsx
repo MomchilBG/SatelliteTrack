@@ -10,7 +10,7 @@ export const colors = {
   addedSat_1: '0, 140, 140',
   addedSat_2: '130, 0, 140',
   addedSat_3: '90, 90, 90',
-  addedSat_4: '255, 210, 220',
+  addedSat_4: '255, 20, 150',
   satelliteTrack: '255, 166, 0',
   aboutMe: '192, 0, 192',
 };
