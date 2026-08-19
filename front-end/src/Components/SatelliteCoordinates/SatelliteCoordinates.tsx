@@ -48,9 +48,6 @@ const GetData = () => {
       visible: true,
     })),
   );
-  const [trackedIDs, setTrackedIDs] = useState<number[]>(
-    TLEs.map((tle) => +tle.id),
-  );
   const [postError, setPostError] = useState('');
   const [locations, setLocations] = useState(
     TLEs[0].loaded
@@ -74,7 +71,7 @@ const GetData = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      fetchData(`getbyids?${trackedIDs.map((id) => `ids=${id}`).join('&')}`)
+      fetchData(`getbyids?${TLEs.map((tle) => `ids=${tle.id}`).join('&')}`)
         .then((response) => {
           setTLEs(
             response.satellites.map((TLE, i) => ({
@@ -95,7 +92,7 @@ const GetData = () => {
     }, 20000);
 
     return () => clearInterval(interval);
-  }, [TLEs, trackedIDs]);
+  }, [TLEs]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -155,7 +152,6 @@ const GetData = () => {
               loaded: true,
             },
           ]);
-          setTrackedIDs([...trackedIDs, +fetchedSatellite.id]);
           return 'successful';
         }
       } catch (e) {
@@ -163,7 +159,7 @@ const GetData = () => {
         return 'failed';
       }
     },
-    [locations, TLEs, trackedIDs],
+    [locations, TLEs],
   );
 
   return TLEs[0].loaded && locations[0].loaded ? (
