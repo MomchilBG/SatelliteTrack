@@ -124,8 +124,25 @@ server.get('/defaults', async (req, res) => {
   }
 });
 
-server.get('/noradIDs', (req, res) => {
-  req.query.map((noradID) => {});
+server.get('/getbyids', async (req, res) => {
+  const ids = req.query.ids;
+  try {
+    const [querySats, queryTLEs] = await updateTLE(ids, satellites);
+    satellites = querySats;
+    const requestedTLEs = ids.map((noradID) => satellites[noradID]);
+    res.status(200).json({
+      success: true,
+      satellites: requestedTLEs,
+      message: '',
+    });
+  } catch (e) {
+    console.log(`Error occured while updating by query: ${e.message}`);
+    res.status(200).json({
+      success: false,
+      satellites: null,
+      message: 'Failed to fetch by query',
+    });
+  }
 });
 
 server.post('/add_sat', async (req, res) => {
