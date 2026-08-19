@@ -11,6 +11,7 @@ import CollapsableInfo from '../CollaspableInfo/CollapsableInfo.tsx';
 import type { APIResponse, Satellite } from '../../Types/satellite.ts';
 import SatVisibilityToggle from '../SatVisibilityToggle/SatVisibilityToggle.tsx';
 import AddSatellitePanel from '../AddSatellitePanel/AddSatellitePanel.tsx';
+import { defaultNoradIDs } from '../../constants.tsx';
 
 const initialFetch: APIResponse = await (async () => {
   try {
@@ -47,11 +48,13 @@ const GetData = () => {
       visible: true,
     })),
   );
-  const [addedSatellites, setAddedSatellites] = useState<Satellite[]>([]);
+  const [trackedIDs, setTrackedIDs] = useState<number[]>(
+    TLEs.map((tle) => +tle.id),
+  );
   const [postError, setPostError] = useState('');
   const [locations, setLocations] = useState(
     TLEs[0].loaded
-      ? [...TLEs, ...addedSatellites].map((TLE) => ({
+      ? TLEs.map((TLE) => ({
           location: convertTLEtoCoords(TLE.line1, TLE.line2),
           loaded: true,
         }))
@@ -71,7 +74,7 @@ const GetData = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      fetchData('defaults')
+      fetchData(`getbyids?${trackedIDs.map((id) => `ids=${id}`).join('&')}`)
         .then((response) => {
           setTLEs(
             response.satellites.map((TLE, i) => ({
@@ -92,13 +95,13 @@ const GetData = () => {
     }, 20000);
 
     return () => clearInterval(interval);
-  }, [TLEs]);
+  }, [TLEs, trackedIDs]);
 
   useEffect(() => {
     const interval = setInterval(() => {
       if (TLEs[0].loaded) {
         setLocations(
-          [...TLEs, ...addedSatellites].map((TLE) => ({
+          TLEs.map((TLE) => ({
             location: convertTLEtoCoords(TLE.line1, TLE.line2),
             loaded: true,
           })),
@@ -107,36 +110,23 @@ const GetData = () => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [TLEs, addedSatellites]);
+  }, [TLEs]);
 
   const toggleVisibility = useCallback(
     (satellite: Satellite, index: number, element: HTMLButtonElement) => {
-      let TLEsModCopy;
-      let modIndex;
-      if (index > TLEs.length - 1) {
-        TLEsModCopy = [...addedSatellites];
-        modIndex = index - TLEs.length;
-      } else {
-        TLEsModCopy = [...TLEs];
-        modIndex = index;
-      }
+      const TLEsModCopy = [...TLEs];
       if (satellite.visible === true) {
-        TLEsModCopy[modIndex].visible = false;
+        TLEsModCopy[index].visible = false;
         element.classList.remove('visible');
         element.classList.add('not-visible');
       } else if (satellite.visible === false) {
-        TLEsModCopy[modIndex].visible = true;
+        TLEsModCopy[index].visible = true;
         element.classList.remove('not-visible');
         element.classList.add('visible');
       }
-
-      if (index > TLEs.length - 1) {
-        setAddedSatellites(TLEsModCopy);
-      } else {
-        setTLEs(TLEsModCopy);
-      }
+      setTLEs(TLEsModCopy);
     },
-    [TLEs, addedSatellites],
+    [TLEs],
   );
 
   const handlePost = useCallback(
@@ -150,11 +140,11 @@ const GetData = () => {
           setPostError('');
           const fetchedSatellite: Satellite = {
             ...response.satellites[0],
-            key: `addedSat_${addedSatellites.length}`,
+            key: `addedSat_${TLEs.length - Object.values(defaultNoradIDs).length}`,
             loaded: true,
             visible: true,
           };
-          setAddedSatellites([...addedSatellites, fetchedSatellite]);
+          setTLEs([...TLEs, fetchedSatellite]);
           setLocations([
             ...locations,
             {
@@ -165,6 +155,7 @@ const GetData = () => {
               loaded: true,
             },
           ]);
+          setTrackedIDs([...trackedIDs, +fetchedSatellite.id]);
           return 'successful';
         }
       } catch (e) {
@@ -172,7 +163,7 @@ const GetData = () => {
         return 'failed';
       }
     },
-    [locations, addedSatellites],
+    [locations, TLEs, trackedIDs],
   );
 
   return TLEs[0].loaded && locations[0].loaded ? (
@@ -191,12 +182,12 @@ const GetData = () => {
             handlePost={handlePost}
             postError={postError}
             setPostError={setPostError}
-            numOfAddedSats={addedSatellites.length}
+            numOfAddedSats={TLEs.length - Object.values(defaultNoradIDs).length}
           />
         )}
         {menu === 'info' && (
           <div id="data">
-            {[...TLEs, ...addedSatellites].map((satellite, i) => (
+            {TLEs.map((satellite, i) => (
               <div className="satellite-data-panel-item" key={i}>
                 <SatVisibilityToggle
                   onClick={toggleVisibility}
@@ -216,7 +207,7 @@ const GetData = () => {
 
       <div id="map-info">
         <LeafletMap
-          satellites={[...TLEs, ...addedSatellites].reduce(
+          satellites={TLEs.reduce(
             (
               prev: {
                 key: string;
