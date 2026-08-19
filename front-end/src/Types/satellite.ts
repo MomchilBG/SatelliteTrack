@@ -3,6 +3,7 @@ export type fetchedTLEs = {
   id: string;
   line1: string;
   line2: string;
+  lastUpdated: Date;
 };
 
 export type Satellite = {
@@ -10,6 +11,7 @@ export type Satellite = {
   id: string;
   line1: string;
   line2: string;
+  lastUpdated: Date;
   key: string;
   visible: boolean;
   loaded: boolean;
@@ -20,6 +22,7 @@ export type SatelliteInfo = {
   id: string;
   line1: string;
   line2: string;
+  lastUpdated: Date;
   key: string;
   visible: boolean;
   loaded: boolean;
@@ -31,8 +34,8 @@ export type SatelliteInfo = {
   };
 };
 
-export type PostSatelliteResponse = {
+export type APIResponse = {
   success: boolean;
-  satellite: fetchedTLEs[];
+  satellites: fetchedTLEs[];
   message: string;
 };

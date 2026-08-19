@@ -1,9 +1,9 @@
 import axios from 'axios';
-import type { fetchedTLEs } from '../Types/satellite.ts';
+import type { APIResponse } from '../Types/satellite.ts';
 
-export const fetchData = async (satellite: string): Promise<fetchedTLEs[]> => {
+export const fetchData = async (satellite: string): Promise<APIResponse> => {
   try {
-    const response = await axios.get<fetchedTLEs[]>(
+    const response = await axios.get<APIResponse>(
       `http://localhost:5001/${satellite}`,
       {
         responseType: 'json',
@@ -11,24 +11,34 @@ export const fetchData = async (satellite: string): Promise<fetchedTLEs[]> => {
     );
 
     return (
-      response?.data ?? [
+      response?.data ?? {
+        success: false,
+        satellites: [
+          {
+            name: '',
+            id: '',
+            line1: '',
+            line2: '',
+            lastUpdated: new Date(),
+          },
+        ],
+        message: '',
+      }
+    );
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    return {
+      success: false,
+      satellites: [
         {
           name: '',
           id: '',
           line1: '',
           line2: '',
+          lastUpdated: new Date(),
         },
-      ]
-    );
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    return [
-      {
-        name: '',
-        id: '',
-        line1: '',
-        line2: '',
-      },
-    ];
+      ],
+      message: '',
+    };
   }
 };

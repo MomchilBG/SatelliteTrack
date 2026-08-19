@@ -1,9 +1,7 @@
 import axios from 'axios';
-import type { PostSatelliteResponse } from '../Types/satellite.ts';
+import type { APIResponse } from '../Types/satellite.ts';
 
-export const postSatellite = (
-  noradID: string,
-): Promise<PostSatelliteResponse> =>
+export const postSatellite = (noradID: string): Promise<APIResponse> =>
   axios
     .post(`http://localhost:5001/add_sat`, { noradID: noradID })
     .then((response) => response.data)
@@ -11,12 +9,15 @@ export const postSatellite = (
       console.log(`Error posting satellite: ${error}`);
       return {
         success: false,
-        satellite: {
-          name: '',
-          id: '',
-          line1: '',
-          line2: '',
-        },
+        satellites: [
+          {
+            name: '',
+            id: '',
+            line1: '',
+            line2: '',
+            lastUpdated: new Date(),
+          },
+        ],
         message: '',
       };
     });
