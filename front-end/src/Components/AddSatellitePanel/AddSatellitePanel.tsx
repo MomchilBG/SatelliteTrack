@@ -1,17 +1,18 @@
 import './AddSatellitePanel.css';
 import { useCallback, useState } from 'react';
-import { defaultNoradIDs } from '../../constants.tsx';
 
 const AddSatellitePanel = ({
   handlePost,
   postError,
   setPostError,
   numOfAddedSats,
+  trackedIDs,
 }: {
   handlePost: (noradID: string) => Promise<'failed' | 'successful'>;
   postError: string;
   setPostError: (postError: string) => void;
   numOfAddedSats: number;
+  trackedIDs: number[];
 }) => {
   const [inputContent, setInputContent] = useState('');
   const [noradID, setNoradID] = useState('0');
@@ -53,7 +54,7 @@ const AddSatellitePanel = ({
         });
       } else if (
         +content === +lastAdded ||
-        Object.values(defaultNoradIDs).some((id) => +content === id)
+        trackedIDs.some((id) => +content === id)
       ) {
         setMessage({
           success: false,
@@ -69,7 +70,7 @@ const AddSatellitePanel = ({
         setNoradID(content);
       }
     },
-    [lastAdded, postError.length, setPostError],
+    [lastAdded, postError.length, setPostError, trackedIDs],
   );
 
   const handleClick = useCallback(
