@@ -208,12 +208,14 @@ const GetData = () => {
                   title={satellite.name}
                   satellite={{ ...satellite, ...locations[i] }}
                 />
-                <Button
-                  //@ts-expect-error uwu
-                  onClick={removeSatellite}
-                  onClickArgs={[i]}
-                  className="custom-button remove"
-                />
+                {i >= Object.values(defaultNoradIDs).length && (
+                  <Button
+                    //@ts-expect-error uwu
+                    onClick={removeSatellite}
+                    onClickArgs={[i]}
+                    className="custom-button remove"
+                  />
+                )}
               </div>
             ))}
           </div>
