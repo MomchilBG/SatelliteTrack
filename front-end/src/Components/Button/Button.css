@@ -1,5 +1,5 @@
-.visibility-toggle {
-  width: 15%;
+.custom-button {
+  width: 100%;
   border-radius: 0;
   border: none;
   background-color: rgb(40, 40, 40);
@@ -8,7 +8,7 @@
   font-size: 20px;
 }
 
-.visibility-toggle:hover {
+.custom-button:hover {
   cursor: pointer;
   background-color: rgb(70, 70, 70);
 }
@@ -19,4 +19,8 @@
 
 .not-visible::after {
   content: '\25c7';
+}
+
+.remove::after {
+  content: '\58';
 }
