@@ -1,4 +1,18 @@
 import type { AboutInfo } from './Types/about_info.ts';
+import type { Satellite } from './Types/satellite.ts';
+
+export const failedFetchPlaceholder: Satellite[] = [
+  {
+    name: '',
+    id: '',
+    line1: '',
+    line2: '',
+    lastUpdated: new Date(),
+    key: '',
+    visible: false,
+    loaded: false,
+  },
+];
 
 export const periodInSec = 15;
 
