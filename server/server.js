@@ -129,7 +129,7 @@ server.get('/getbyids', async (req, res) => {
   try {
     const [querySats, queryTLEs] = await updateTLE(ids, satellites);
     satellites = querySats;
-    const requestedTLEs = ids.map((noradID) => satellites[noradID]);
+    const requestedTLEs = ids.map((noradID) => satellites[+noradID]);
     res.status(200).json({
       success: true,
       satellites: requestedTLEs,
