@@ -13,15 +13,7 @@ export const fetchData = async (satellite: string): Promise<APIResponse> => {
     return (
       response?.data ?? {
         success: false,
-        satellites: [
-          {
-            name: '',
-            id: '',
-            line1: '',
-            line2: '',
-            lastUpdated: new Date(),
-          },
-        ],
+        satellites: null,
         message: '',
       }
     );
@@ -29,16 +21,8 @@ export const fetchData = async (satellite: string): Promise<APIResponse> => {
     console.error('Error fetching data:', error);
     return {
       success: false,
-      satellites: [
-        {
-          name: '',
-          id: '',
-          line1: '',
-          line2: '',
-          lastUpdated: new Date(),
-        },
-      ],
-      message: '',
+      satellites: null,
+      message: 'Failed to fetch TLEs',
     };
   }
 };

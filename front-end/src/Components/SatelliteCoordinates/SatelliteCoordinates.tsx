@@ -11,7 +11,7 @@ import CollapsableInfo from '../CollaspableInfo/CollapsableInfo.tsx';
 import type { APIResponse, Satellite } from '../../Types/satellite.ts';
 import Button from '../Button/Button.tsx';
 import AddSatellitePanel from '../AddSatellitePanel/AddSatellitePanel.tsx';
-import { defaultNoradIDs } from '../../constants.tsx';
+import { defaultNoradIDs, failedFetchPlaceholder } from '../../constants.tsx';
 
 const initialFetch: APIResponse = await (async () => {
   try {
@@ -21,15 +21,7 @@ const initialFetch: APIResponse = await (async () => {
     console.log(e);
     return {
       success: false,
-      satellites: [
-        {
-          name: '',
-          id: '',
-          line1: '',
-          line2: '',
-          lastUpdated: new Date(),
-        },
-      ],
+      satellites: null,
       message: '',
     };
   }
@@ -37,16 +29,14 @@ const initialFetch: APIResponse = await (async () => {
 
 const GetData = () => {
   const [TLEs, setTLEs] = useState<Satellite[]>(
-    initialFetch.satellites.map((TLE) => ({
-      name: TLE.name,
-      id: TLE.id,
-      line1: TLE.line1,
-      line2: TLE.line2,
-      lastUpdated: TLE.lastUpdated,
-      key: TLE.name.split(' ')[0].toLowerCase(),
-      loaded: TLE.line1 === '' ? false : true,
-      visible: true,
-    })),
+    initialFetch.satellites
+      ? initialFetch.satellites.map((TLE) => ({
+          ...TLE,
+          key: TLE.name.split(' ')[0].toLowerCase(),
+          loaded: true,
+          visible: true,
+        }))
+      : failedFetchPlaceholder,
   );
   const [postError, setPostError] = useState('');
   const [locations, setLocations] = useState(
@@ -73,18 +63,20 @@ const GetData = () => {
     const interval = setInterval(() => {
       fetchData(`getbyids?${TLEs.map((tle) => `ids=${tle.id}`).join('&')}`)
         .then((response) => {
-          setTLEs(
-            response.satellites.map((TLE, i) => ({
-              name: TLE.name,
-              id: TLE.id,
-              line1: TLE.line1,
-              line2: TLE.line2,
-              lastUpdated: TLE.lastUpdated,
-              key: i < TLEs.length ? TLEs[i].key : '',
-              loaded: true,
-              visible: i < TLEs.length ? TLEs[i].visible : true,
-            })),
-          );
+          if (response.satellites) {
+            setTLEs(
+              response.satellites.map((TLE, i) => ({
+                name: TLE.name,
+                id: TLE.id,
+                line1: TLE.line1,
+                line2: TLE.line2,
+                lastUpdated: TLE.lastUpdated,
+                key: i < TLEs.length ? TLEs[i].key : '',
+                loaded: true,
+                visible: i < TLEs.length ? TLEs[i].visible : true,
+              })),
+            );
+          }
         })
         .catch((error) => {
           console.log('Error getting data:', error);
@@ -145,26 +137,29 @@ const GetData = () => {
           setPostError(`${response.message} for Norad ID ${noradID}`);
           return 'failed';
         } else {
-          setPostError('');
-          const fetchedSatellite: Satellite = {
-            ...response.satellites[0],
-            key: `addedSat_${TLEs.length - Object.values(defaultNoradIDs).length}`,
-            loaded: true,
-            visible: true,
-          };
-          setTLEs([...TLEs, fetchedSatellite]);
-          setLocations([
-            ...locations,
-            {
-              location: convertTLEtoCoords(
-                fetchedSatellite.line1,
-                fetchedSatellite.line2,
-              ),
+          if (response.satellites) {
+            setPostError('');
+            const fetchedSatellite: Satellite = {
+              ...response.satellites[0],
+              key: `addedSat_${TLEs.length - Object.values(defaultNoradIDs).length}`,
               loaded: true,
-            },
-          ]);
-          return 'successful';
+              visible: true,
+            };
+            setTLEs([...TLEs, fetchedSatellite]);
+            setLocations([
+              ...locations,
+              {
+                location: convertTLEtoCoords(
+                  fetchedSatellite.line1,
+                  fetchedSatellite.line2,
+                ),
+                loaded: true,
+              },
+            ]);
+            return 'successful';
+          }
         }
+        return 'failed';
       } catch (e) {
         console.log(`Error handling post: ${e}`);
         return 'failed';

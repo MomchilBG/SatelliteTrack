@@ -36,6 +36,6 @@ export type SatelliteInfo = {
 
 export type APIResponse = {
   success: boolean;
-  satellites: fetchedTLEs[];
+  satellites: fetchedTLEs[] | null;
   message: string;
 };

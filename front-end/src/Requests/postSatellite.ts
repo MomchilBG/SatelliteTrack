@@ -9,15 +9,7 @@ export const postSatellite = (noradID: string): Promise<APIResponse> =>
       console.log(`Error posting satellite: ${error}`);
       return {
         success: false,
-        satellites: [
-          {
-            name: '',
-            id: '',
-            line1: '',
-            line2: '',
-            lastUpdated: new Date(),
-          },
-        ],
-        message: '',
+        satellites: null,
+        message: 'Post request failed',
       };
     });
