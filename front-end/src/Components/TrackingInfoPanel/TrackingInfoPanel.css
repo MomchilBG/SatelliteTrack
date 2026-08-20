@@ -4,6 +4,7 @@
   justify-items: left;
   padding-left: 1.5rem;
   box-sizing: border-box;
+  grid-area: 2 / 1 / span 1 / span 3;
 }
 
 .data-item {
