@@ -9,7 +9,7 @@ import {
 } from '../../util_funcs/util_funcs.ts';
 import CollapsableInfo from '../CollaspableInfo/CollapsableInfo.tsx';
 import type { APIResponse, Satellite } from '../../Types/satellite.ts';
-import SatVisibilityToggle from '../SatVisibilityToggle/SatVisibilityToggle.tsx';
+import Button from '../Button/Button.tsx';
 import AddSatellitePanel from '../AddSatellitePanel/AddSatellitePanel.tsx';
 import { defaultNoradIDs } from '../../constants.tsx';
 
@@ -126,6 +126,17 @@ const GetData = () => {
     [TLEs],
   );
 
+  const removeSatellite = useCallback(
+    (index: number) => {
+      const TLEsCopy = [
+        ...TLEs.slice(0, index),
+        ...TLEs.slice(index + 1, TLEs.length - 1),
+      ];
+      setTLEs(TLEsCopy);
+    },
+    [TLEs],
+  );
+
   const handlePost = useCallback(
     async (noradID: string) => {
       try {
@@ -179,21 +190,29 @@ const GetData = () => {
             postError={postError}
             setPostError={setPostError}
             numOfAddedSats={TLEs.length - Object.values(defaultNoradIDs).length}
+            trackedIDs={TLEs.map((tle) => +tle.id)}
           />
         )}
         {menu === 'info' && (
           <div id="data">
             {TLEs.map((satellite, i) => (
               <div className="satellite-data-panel-item" key={i}>
-                <SatVisibilityToggle
+                <Button
+                  //@ts-expect-error uwu
                   onClick={toggleVisibility}
-                  index={i}
-                  satellite={satellite}
+                  onClickArgs={[satellite, i]}
+                  className="custom-button visible"
                 />
                 <CollapsableInfo
                   colorsKey={satellite.key}
                   title={satellite.name}
                   satellite={{ ...satellite, ...locations[i] }}
+                />
+                <Button
+                  //@ts-expect-error uwu
+                  onClick={removeSatellite}
+                  onClickArgs={[i]}
+                  className="custom-button remove"
                 />
               </div>
             ))}
@@ -217,8 +236,9 @@ const GetData = () => {
                 prev.push({
                   key: current.key,
                   marker_coords: [
-                    locations[i].location.degreesLat,
-                    locations[i].location.degreesLong,
+                    locations[i < locations.length ? i : 0].location.degreesLat,
+                    locations[i < locations.length ? i : 0].location
+                      .degreesLong,
                   ],
                   path: getSatellitePath(current.line1, current.line2),
                 });
