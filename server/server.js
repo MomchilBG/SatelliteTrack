@@ -9,17 +9,6 @@ server.use(cors());
 server.use(express.json());
 
 let satellites = {};
-(async () => {
-  try {
-    const [initSats, initTLEs] = await updateTLE(
-      Object.values(DEF_NORAD_IDS),
-      satellites,
-    );
-    satellites = initSats;
-  } catch (e) {
-    console.log(`Error occured during init: ${e.message}`);
-  }
-})();
 
 server.get('/iss', async (req, res) => {
   try {
