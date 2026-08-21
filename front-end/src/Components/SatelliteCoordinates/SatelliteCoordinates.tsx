@@ -11,7 +11,11 @@ import CollapsableInfo from '../CollaspableInfo/CollapsableInfo.tsx';
 import type { APIResponse, Satellite } from '../../Types/satellite.ts';
 import Button from '../Button/Button.tsx';
 import AddSatellitePanel from '../AddSatellitePanel/AddSatellitePanel.tsx';
-import { defaultNoradIDs, failedFetchPlaceholder } from '../../constants.tsx';
+import {
+  defaultNoradIDs,
+  failedFetchPlaceholder,
+  limitOfSatellites,
+} from '../../constants.tsx';
 
 const initialFetch: APIResponse = await (async () => {
   try {
@@ -28,6 +32,14 @@ const initialFetch: APIResponse = await (async () => {
 })();
 
 const GetData = () => {
+  const [unusedColors, setUnusedColors] = useState(
+    Array.from(
+      {
+        length: limitOfSatellites - Object.values(defaultNoradIDs).length,
+      },
+      (_, i) => `addedSat_${i}`,
+    ),
+  );
   const [TLEs, setTLEs] = useState<Satellite[]>(
     initialFetch.satellites
       ? initialFetch.satellites.map((TLE) => ({
@@ -71,9 +83,9 @@ const GetData = () => {
                 line1: TLE.line1,
                 line2: TLE.line2,
                 lastUpdated: TLE.lastUpdated,
-                key: i < TLEs.length ? TLEs[i].key : '',
+                key: TLEs[i].key,
                 loaded: true,
-                visible: i < TLEs.length ? TLEs[i].visible : true,
+                visible: TLEs[i].visible,
               })),
             );
           }
@@ -124,9 +136,10 @@ const GetData = () => {
         ...TLEs.slice(0, index),
         ...TLEs.slice(index + 1, TLEs.length),
       ];
+      setUnusedColors([...unusedColors, TLEs[index].key]);
       setTLEs(TLEsCopy);
     },
-    [TLEs],
+    [TLEs, unusedColors],
   );
 
   const handlePost = useCallback(
@@ -141,11 +154,12 @@ const GetData = () => {
             setPostError('');
             const fetchedSatellite: Satellite = {
               ...response.satellites[0],
-              key: `addedSat_${TLEs.length - Object.values(defaultNoradIDs).length}`,
+              key: unusedColors[0],
               loaded: true,
               visible: true,
             };
             setTLEs([...TLEs, fetchedSatellite]);
+            setUnusedColors(unusedColors.slice(1));
             setLocations([
               ...locations,
               {
@@ -165,7 +179,7 @@ const GetData = () => {
         return 'failed';
       }
     },
-    [locations, TLEs],
+    [locations, TLEs, unusedColors],
   );
 
   return TLEs[0].loaded && locations[0].loaded ? (
@@ -184,7 +198,7 @@ const GetData = () => {
             handlePost={handlePost}
             postError={postError}
             setPostError={setPostError}
-            numOfAddedSats={TLEs.length - Object.values(defaultNoradIDs).length}
+            numOfSats={TLEs.length}
             trackedIDs={TLEs.map((tle) => +tle.id)}
           />
         )}
