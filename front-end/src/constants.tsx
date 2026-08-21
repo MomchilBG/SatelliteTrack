@@ -35,6 +35,15 @@ export const defaultNoradIDs = Object.freeze({
   CSS: 48274,
 });
 
+export const tooltipContent = (
+  <p>
+    Add more satellites to track by inputting their{' '}
+    <span style={{ color: 'orange' }}>NORAD IDs</span>. You can add{' '}
+    <span style={{ color: 'orange' }}>up to 5</span> satellites in active orbit
+    around the Earth.
+  </p>
+);
+
 export const aboutISS: AboutInfo = Object.freeze({
   key: 'iss',
   name: 'ISS',
