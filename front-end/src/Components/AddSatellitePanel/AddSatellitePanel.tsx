@@ -1,5 +1,6 @@
 import './AddSatellitePanel.css';
 import { useCallback, useState } from 'react';
+import { tooltipContent } from '../../constants';
 
 const AddSatellitePanel = ({
   handlePost,
@@ -95,12 +96,7 @@ const AddSatellitePanel = ({
 
   return (
     <div id="add-satellite-panel">
-      <div id="tooltip">
-        <p>
-          Add more satellites to track by inputting their NORAD IDs. You can
-          only add satellites in active orbit around the Earth.
-        </p>
-      </div>
+      <div id="tooltip">{tooltipContent}</div>
       <div id="add-sat-input-container">
         <input
           type="text"
