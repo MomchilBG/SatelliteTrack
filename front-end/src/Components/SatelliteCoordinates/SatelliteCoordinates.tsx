@@ -122,7 +122,7 @@ const GetData = () => {
     (index: number) => {
       const TLEsCopy = [
         ...TLEs.slice(0, index),
-        ...TLEs.slice(index + 1, TLEs.length - 1),
+        ...TLEs.slice(index + 1, TLEs.length),
       ];
       setTLEs(TLEsCopy);
     },
