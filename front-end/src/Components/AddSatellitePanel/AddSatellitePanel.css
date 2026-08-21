@@ -14,10 +14,11 @@
   width: 90%;
   height: fit-content;
   margin-top: 1rem;
-  font-size: 10px;
 }
 
 #tooltip > p {
+  text-align: center;
+  font-size: 11px;
   padding: 0 0.5rem;
 }
 
