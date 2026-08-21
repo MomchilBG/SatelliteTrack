@@ -95,7 +95,13 @@ const AddSatellitePanel = ({
 
   return (
     <div id="add-satellite-panel">
-      <div>
+      <div id="tooltip">
+        <p>
+          Add more satellites to track by inputting their NORAD IDs. You can
+          only add satellites in active orbit around the Earth.
+        </p>
+      </div>
+      <div id="add-sat-input-container">
         <input
           type="text"
           id="norad-id-input"

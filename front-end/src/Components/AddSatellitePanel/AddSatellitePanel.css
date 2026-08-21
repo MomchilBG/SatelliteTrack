@@ -8,7 +8,20 @@
   height: 100%;
 }
 
-#add-satellite-panel > div {
+#tooltip {
+  background-color: #ffffff3c;
+  border: 3px solid #0101013c;
+  width: 90%;
+  height: fit-content;
+  margin-top: 1rem;
+  font-size: 10px;
+}
+
+#tooltip > p {
+  padding: 0 0.5rem;
+}
+
+#add-sat-input-container {
   display: flex;
   justify-content: space-between;
   margin-top: 1rem;
