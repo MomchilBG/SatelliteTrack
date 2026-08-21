@@ -16,6 +16,8 @@ export const failedFetchPlaceholder: Satellite[] = [
 
 export const periodInSec = 15;
 
+export const limitOfSatellites = 8;
+
 export const colors = Object.freeze({
   iss: '0, 0, 255',
   hst: '255, 0, 0',
