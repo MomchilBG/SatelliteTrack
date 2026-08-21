@@ -1,24 +1,24 @@
 import './AddSatellitePanel.css';
 import { useCallback, useState } from 'react';
-import { tooltipContent } from '../../constants';
+import { tooltipContent, limitOfSatellites } from '../../constants';
 
 const AddSatellitePanel = ({
   handlePost,
   postError,
   setPostError,
-  numOfAddedSats,
+  numOfSats,
   trackedIDs,
 }: {
   handlePost: (noradID: string) => Promise<'failed' | 'successful'>;
   postError: string;
   setPostError: (postError: string) => void;
-  numOfAddedSats: number;
+  numOfSats: number;
   trackedIDs: number[];
 }) => {
   const [inputContent, setInputContent] = useState('');
   const [noradID, setNoradID] = useState('0');
   const [message, setMessage] = useState(
-    numOfAddedSats >= 5
+    numOfSats >= limitOfSatellites
       ? {
           success: false,
           error: true,
@@ -109,7 +109,10 @@ const AddSatellitePanel = ({
             handleClick(noradID)
           }
           value={inputContent}
-          placeholder="Norad ID..."
+          placeholder={
+            numOfSats < limitOfSatellites ? 'Norad ID...' : 'Limit reached'
+          }
+          disabled={numOfSats >= limitOfSatellites}
         />
         <button
           id="add-satellite-button"
