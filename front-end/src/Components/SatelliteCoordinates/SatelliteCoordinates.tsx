@@ -1,105 +1,85 @@
 import { useCallback, useEffect, useState } from 'react';
+
 import { fetchData } from '../../Requests/fetchSatellite.ts';
 import { postSatellite } from '../../Requests/postSatellite.ts';
-import LeafletMap from '../LeafletMap/LeafletMap.tsx';
-import './SatelliteCoordinates.css';
 import {
   convertTLEtoCoords,
   getSatellitePath,
 } from '../../util_funcs/util_funcs.ts';
+import type { Satellite, Location } from '../../Types/satellite.ts';
+import { defaultNoradIDs, limitOfSatellites } from '../../constants.tsx';
+
+import LeafletMap from '../LeafletMap/LeafletMap.tsx';
 import CollapsableInfo from '../CollaspableInfo/CollapsableInfo.tsx';
-import type { APIResponse, Satellite } from '../../Types/satellite.ts';
 import Button from '../Button/Button.tsx';
 import AddSatellitePanel from '../AddSatellitePanel/AddSatellitePanel.tsx';
-import {
-  defaultNoradIDs,
-  failedFetchPlaceholder,
-  limitOfSatellites,
-} from '../../constants.tsx';
 
-const [getSavedSats, setSavedSats] = [
+import './SatelliteCoordinates.css';
+
+const [getSavedIDs, setSavedIDs] = [
   () => window.localStorage.getItem('ids'),
   (ids: number[]) => window.localStorage.setItem('ids', ids.join(',')),
 ];
 
-const initialFetch: APIResponse = await (async () => {
-  try {
-    const getFetchPath = () => {
-      if (getSavedSats() !== null) {
-        const ids = getSavedSats()?.split(',');
-        return `getbyids?${ids?.map((id) => `ids=${id}`).join('&')}`;
-      }
-      return 'defaults';
-    };
-    const response = fetchData(getFetchPath());
-    return response;
-  } catch (e) {
-    console.log(e);
-    return {
-      success: false,
-      satellites: null,
-      message: '',
-    };
-  }
-})();
-
 const GetData = () => {
-  const [unusedColors, setUnusedColors] = useState(
-    Array.from(
-      {
-        length:
-          limitOfSatellites -
-          (initialFetch.satellites?.length ||
-            Object.values(defaultNoradIDs).length),
-      },
-      (_, i) =>
-        `addedSat_${initialFetch.satellites && initialFetch.satellites.length > 3 ? initialFetch.satellites.length - 3 + i : i}`,
-    ),
-  );
-  const [TLEs, setTLEs] = useState<Satellite[]>(
-    initialFetch.satellites
-      ? initialFetch.satellites.map((TLE, i) => ({
-          ...TLE,
-          key:
-            i > 2 ? `addedSat_${i - 3}` : TLE.name.split(' ')[0].toLowerCase(),
-          loaded: true,
-          visible: true,
-        }))
-      : failedFetchPlaceholder,
-  );
+  const [unusedColors, setUnusedColors] = useState<string[]>([]);
+  const [TLEs, setTLEs] = useState<Satellite[]>([]);
   const [postError, setPostError] = useState('');
-  const [locations, setLocations] = useState(
-    TLEs[0].loaded
-      ? TLEs.map((TLE) => ({
-          location: convertTLEtoCoords(TLE.line1, TLE.line2),
-          loaded: true,
-        }))
-      : [
-          {
-            location: {
-              height: -1,
-              degreesLat: 0,
-              degreesLong: 0,
-              velocity: 0,
-            },
-            loaded: false,
-          },
-        ],
-  );
+  const [locations, setLocations] = useState<Location[]>([]);
   const [menu, setMenu] = useState<'info' | 'addSat'>('info');
 
   useEffect(() => {
+    if (TLEs.length === 0) {
+      const getFetchPath =
+        getSavedIDs() !== null
+          ? `getbyids?${getSavedIDs()
+              ?.split(',')
+              ?.map((id) => `ids=${id}`)
+              .join('&')}`
+          : 'defaults';
+
+      fetchData(getFetchPath)
+        .then((response) => {
+          if (response.satellites) {
+            setTLEs(
+              response.satellites.map((TLE, i) => ({
+                ...TLE,
+                key:
+                  i > 2
+                    ? `addedSat_${i - 3}`
+                    : TLE.name.split(' ')[0].toLowerCase(),
+                loaded: true,
+                visible: true,
+              })),
+            );
+            setUnusedColors(
+              Array.from(
+                {
+                  length: limitOfSatellites - response.satellites.length,
+                },
+                (_, i) =>
+                  `addedSat_${response.satellites && response.satellites.length > 3 ? response.satellites.length - 3 + i : i}`,
+              ),
+            );
+            setLocations(
+              TLEs.map((TLE) => ({
+                location: convertTLEtoCoords(TLE.line1, TLE.line2),
+                loaded: true,
+              })),
+            );
+          }
+        })
+        .catch((error) => {
+          console.log('Error with initial fetch: ', error);
+        });
+    }
     const interval = setInterval(() => {
       fetchData(`getbyids?${TLEs.map((tle) => `ids=${tle.id}`).join('&')}`)
         .then((response) => {
           if (response.satellites) {
             setTLEs(
               response.satellites.map((TLE, i) => ({
-                name: TLE.name,
-                id: TLE.id,
-                line1: TLE.line1,
-                line2: TLE.line2,
-                lastUpdated: TLE.lastUpdated,
+                ...TLE,
                 key: TLEs[i].key,
                 loaded: true,
                 visible: TLEs[i].visible,
@@ -155,7 +135,7 @@ const GetData = () => {
       ];
       setUnusedColors([...unusedColors, TLEs[index].key]);
       setTLEs(TLEsCopy);
-      setSavedSats(TLEsCopy.map((tle) => +tle.id));
+      setSavedIDs(TLEsCopy.map((tle) => +tle.id));
     },
     [TLEs, unusedColors],
   );
@@ -176,7 +156,7 @@ const GetData = () => {
               loaded: true,
               visible: true,
             };
-            setSavedSats([...TLEs.map((tle) => +tle.id), +fetchedSatellite.id]);
+            setSavedIDs([...TLEs.map((tle) => +tle.id), +fetchedSatellite.id]);
             setTLEs([...TLEs, fetchedSatellite]);
             setUnusedColors(unusedColors.slice(1));
             setLocations([
@@ -201,16 +181,22 @@ const GetData = () => {
     [locations, TLEs, unusedColors],
   );
 
-  return TLEs[0].loaded && locations[0].loaded ? (
+  return TLEs[0]?.loaded && locations[0]?.loaded ? (
     <div id="app">
       <div id="menu">
         <div id="menu-nav">
-          <button className="menu-nav-button" onClick={() => setMenu('addSat')}>
-            Add Satellite
-          </button>
-          <button className="menu-nav-button" onClick={() => setMenu('info')}>
-            View Info
-          </button>
+          <Button
+            onClickArgs={[]}
+            content="Add Satellite"
+            onClick={() => setMenu('addSat')}
+            className="menu-nav-button"
+          />
+          <Button
+            onClickArgs={[]}
+            content="View Info"
+            onClick={() => setMenu('info')}
+            className="menu-nav-button"
+          />
         </div>
         {menu === 'addSat' && (
           <AddSatellitePanel
@@ -229,7 +215,7 @@ const GetData = () => {
                   //@ts-expect-error uwu
                   onClick={toggleVisibility}
                   onClickArgs={[satellite, i]}
-                  className="custom-button visible"
+                  className={`custom-button ${satellite.visible ? 'visible' : 'not-visible'}`}
                 />
                 <CollapsableInfo
                   colorsKey={satellite.key}
