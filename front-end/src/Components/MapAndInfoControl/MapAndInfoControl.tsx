@@ -14,14 +14,14 @@ import CollapsableInfo from '../CollaspableInfo/CollapsableInfo.tsx';
 import Button from '../Button/Button.tsx';
 import AddSatellitePanel from '../AddSatellitePanel/AddSatellitePanel.tsx';
 
-import './SatelliteCoordinates.css';
+import './MapAndInfoControl.css';
 
 const [getSavedIDs, setSavedIDs] = [
   () => window.localStorage.getItem('ids'),
   (ids: number[]) => window.localStorage.setItem('ids', ids.join(',')),
 ];
 
-const GetData = () => {
+const MapAndInfoControl = () => {
   const [unusedColors, setUnusedColors] = useState<string[]>([]);
   const [TLEs, setTLEs] = useState<Satellite[]>([]);
   const [postError, setPostError] = useState('');
@@ -190,12 +190,18 @@ const GetData = () => {
             content="Add Satellite"
             onClick={() => setMenu('addSat')}
             className="menu-nav-button"
+            style={{}}
+            disabled={false}
+            id=""
           />
           <Button
             onClickArgs={[]}
             content="View Info"
             onClick={() => setMenu('info')}
             className="menu-nav-button"
+            style={{}}
+            disabled={false}
+            id=""
           />
         </div>
         {menu === 'addSat' && (
@@ -271,4 +277,4 @@ const GetData = () => {
   );
 };
 
-export default GetData;
+export default MapAndInfoControl;
