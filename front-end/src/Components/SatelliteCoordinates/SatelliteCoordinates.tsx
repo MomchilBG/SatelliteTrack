@@ -17,9 +17,21 @@ import {
   limitOfSatellites,
 } from '../../constants.tsx';
 
+const [localStorage, setLocalStorage] = [
+  window.localStorage,
+  (ids: string) => window.localStorage.setItem('ids', ids),
+];
+
 const initialFetch: APIResponse = await (async () => {
   try {
-    const response = fetchData('defaults');
+    const getFetchPath = () => {
+      if (localStorage.getItem('ids') !== null) {
+        const ids = localStorage.getItem('ids')?.split(',');
+        return `getbyids?${ids?.map((id) => `ids=${id}`).join('&')}`;
+      }
+      return 'defaults';
+    };
+    const response = fetchData(getFetchPath());
     return response;
   } catch (e) {
     console.log(e);
@@ -35,16 +47,21 @@ const GetData = () => {
   const [unusedColors, setUnusedColors] = useState(
     Array.from(
       {
-        length: limitOfSatellites - Object.values(defaultNoradIDs).length,
+        length:
+          limitOfSatellites -
+          (initialFetch.satellites?.length ||
+            Object.values(defaultNoradIDs).length),
       },
-      (_, i) => `addedSat_${i}`,
+      (_, i) =>
+        `addedSat_${initialFetch.satellites && initialFetch.satellites.length > 3 ? initialFetch.satellites.length - 3 + i : i}`,
     ),
   );
   const [TLEs, setTLEs] = useState<Satellite[]>(
     initialFetch.satellites
-      ? initialFetch.satellites.map((TLE) => ({
+      ? initialFetch.satellites.map((TLE, i) => ({
           ...TLE,
-          key: TLE.name.split(' ')[0].toLowerCase(),
+          key:
+            i > 2 ? `addedSat_${i - 3}` : TLE.name.split(' ')[0].toLowerCase(),
           loaded: true,
           visible: true,
         }))
@@ -138,6 +155,7 @@ const GetData = () => {
       ];
       setUnusedColors([...unusedColors, TLEs[index].key]);
       setTLEs(TLEsCopy);
+      setLocalStorage(TLEsCopy.map((tle) => +tle.id).join(','));
     },
     [TLEs, unusedColors],
   );
@@ -158,6 +176,9 @@ const GetData = () => {
               loaded: true,
               visible: true,
             };
+            setLocalStorage(
+              [...TLEs.map((tle) => +tle.id), +fetchedSatellite.id].join(','),
+            );
             setTLEs([...TLEs, fetchedSatellite]);
             setUnusedColors(unusedColors.slice(1));
             setLocations([
