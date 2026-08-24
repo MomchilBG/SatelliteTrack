@@ -17,6 +17,16 @@ export type Satellite = {
   loaded: boolean;
 };
 
+export type Location = {
+  location: {
+    height: number;
+    degreesLat: number;
+    degreesLong: number;
+    velocity: number;
+  };
+  loaded: boolean;
+};
+
 export type SatelliteInfo = {
   name: string;
   id: string;
