@@ -17,16 +17,16 @@ import {
   limitOfSatellites,
 } from '../../constants.tsx';
 
-const [localStorage, setLocalStorage] = [
-  window.localStorage,
-  (ids: string) => window.localStorage.setItem('ids', ids),
+const [getSavedSats, setSavedSats] = [
+  () => window.localStorage.getItem('ids'),
+  (ids: number[]) => window.localStorage.setItem('ids', ids.join(',')),
 ];
 
 const initialFetch: APIResponse = await (async () => {
   try {
     const getFetchPath = () => {
-      if (localStorage.getItem('ids') !== null) {
-        const ids = localStorage.getItem('ids')?.split(',');
+      if (getSavedSats() !== null) {
+        const ids = getSavedSats()?.split(',');
         return `getbyids?${ids?.map((id) => `ids=${id}`).join('&')}`;
       }
       return 'defaults';
@@ -155,7 +155,7 @@ const GetData = () => {
       ];
       setUnusedColors([...unusedColors, TLEs[index].key]);
       setTLEs(TLEsCopy);
-      setLocalStorage(TLEsCopy.map((tle) => +tle.id).join(','));
+      setSavedSats(TLEsCopy.map((tle) => +tle.id));
     },
     [TLEs, unusedColors],
   );
@@ -176,9 +176,7 @@ const GetData = () => {
               loaded: true,
               visible: true,
             };
-            setLocalStorage(
-              [...TLEs.map((tle) => +tle.id), +fetchedSatellite.id].join(','),
-            );
+            setSavedSats([...TLEs.map((tle) => +tle.id), +fetchedSatellite.id]);
             setTLEs([...TLEs, fetchedSatellite]);
             setUnusedColors(unusedColors.slice(1));
             setLocations([
