@@ -5,15 +5,18 @@ import {
   Polyline,
   useMap,
 } from 'react-leaflet';
+import { Icon } from 'leaflet';
+import { Fragment, useCallback, useEffect, useMemo } from 'react';
+
 import type { MapContainerProps, TileLayerProps } from 'react-leaflet';
 import type { Map } from 'leaflet';
-import { Icon } from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import './LeafletMap.css';
-import { colors } from '../../constants.tsx';
-import { Fragment, useCallback, useEffect, useMemo } from 'react';
+
 import satelliteIcon from '../../../img/iss.png';
 import useResizeObserver from '@react-hook/resize-observer';
+import { colors } from '../../constants.tsx';
+
+import 'leaflet/dist/leaflet.css';
+import './LeafletMap.css';
 
 const MapController = () => {
   const setMinimumZoom = useCallback((map: Map) => {
