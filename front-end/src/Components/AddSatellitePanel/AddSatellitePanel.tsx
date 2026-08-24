@@ -1,6 +1,7 @@
-import './AddSatellitePanel.css';
 import { useCallback, useState } from 'react';
-import { tooltipContent, limitOfSatellites } from '../../constants';
+import { tooltipContent, limitOfSatellites } from '../../constants.tsx';
+import Button from '../Button/Button.tsx';
+import './AddSatellitePanel.css';
 
 const AddSatellitePanel = ({
   handlePost,
@@ -114,16 +115,17 @@ const AddSatellitePanel = ({
           }
           disabled={numOfSats >= limitOfSatellites}
         />
-        <button
+        <Button
           id="add-satellite-button"
           onClick={() => handleClick(noradID)}
+          onClickArgs={[]}
           disabled={message.error || inputContent.length === 0}
           className={
             message.error || inputContent.length === 0 ? 'disable' : ''
           }
-        >
-          Add
-        </button>
+          style={{}}
+          content="Add"
+        />
       </div>
       <div id="norad-id-messages">
         {loading && <p id="norad-id-loading">Loading...</p>}
