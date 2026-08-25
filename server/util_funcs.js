@@ -1,6 +1,10 @@
 import { fetchSatelliteTLE } from './requests.js';
 
 const splitTLEs = (tles) => {
+  if (!(tles instanceof Array)) {
+    throw new Error('tles argument must be an array');
+  }
+
   const now = new Date();
   const satellites = tles.reduce((prev, tle) => {
     if (tle.success === true) {
@@ -22,6 +26,10 @@ const splitTLEs = (tles) => {
 };
 
 const setResponse = (satellites) => {
+  if (!(satellites instanceof Object)) {
+    throw new Error('satellites argument must be an object');
+  }
+
   console.log(
     `Updated data:\n${Object.values(satellites)
       .map((sat) => {
@@ -40,6 +48,10 @@ const setResponse = (satellites) => {
 };
 
 const getData = async (noradIDs) => {
+  if (!(noradIDs instanceof Array)) {
+    throw new Error('noradIDs argument must be an array');
+  }
+
   try {
     const requests = noradIDs.map((id) => fetchSatelliteTLE(id));
     return Promise.all(requests);
@@ -49,7 +61,21 @@ const getData = async (noradIDs) => {
   }
 };
 
-export const updateTLE = async (noradIDs, TLEs = {}) => {
+export const updateTLE = async (
+  noradIDs,
+  TLEs = {},
+  fetchData = getData,
+  splitData = splitTLEs,
+  logData = setResponse,
+) => {
+  if (!(noradIDs instanceof Array)) {
+    throw new Error('noradIDs argument must be an array');
+  }
+
+  if (!(TLEs instanceof Object)) {
+    throw new Error('TLEs argument must be an object');
+  }
+
   try {
     const nowInMs = new Date().valueOf();
     const TLEsCopy = { ...TLEs };
@@ -64,14 +90,14 @@ export const updateTLE = async (noradIDs, TLEs = {}) => {
     });
 
     if (outdatedIDs.length === 0) {
-      return [TLEsCopy, null];
+      return [TLEs, null];
     }
-    const freshTLEs = await getData(outdatedIDs);
+    const freshTLEs = await fetchData(outdatedIDs);
 
     outdatedIDs.map((id, index) => {
       if (freshTLEs[index].success === true) {
-        const freshSat = splitTLEs([freshTLEs[index]]);
-        setResponse(freshSat);
+        const freshSat = splitData([freshTLEs[index]]);
+        logData(freshSat);
         TLEsCopy[id] = freshSat[id];
       } else {
         console.log(`Update for satellite with Norad ID ${id} has failed.`);
