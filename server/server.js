@@ -93,10 +93,7 @@ server.get('/css', async (req, res) => {
 
 server.get('/defaults', async (req, res) => {
   try {
-    const [sats, defTLEs] = await updateTLE(
-      Object.values(DEF_NORAD_IDS),
-      satellites,
-    );
+    const sats = (await updateTLE(Object.values(DEF_NORAD_IDS), satellites))[0];
     satellites = sats;
     res.status(200).json({
       success: true,
@@ -104,7 +101,7 @@ server.get('/defaults', async (req, res) => {
       message: '',
     });
   } catch (e) {
-    console.log(`Error occured during defaults fetch for ${id}: ${e.message}`);
+    console.log(`Error occured during defaults fetch: ${e.message}`);
     res.status(200).json({
       success: false,
       satellites: null,
@@ -116,7 +113,7 @@ server.get('/defaults', async (req, res) => {
 server.get('/getbyids', async (req, res) => {
   const ids = req.query.ids;
   try {
-    const [querySats, queryTLEs] = await updateTLE(ids, satellites);
+    const querySats = (await updateTLE(ids, satellites))[0];
     satellites = querySats;
     const requestedTLEs = ids.map((noradID) => satellites[+noradID]);
     res.status(200).json({
