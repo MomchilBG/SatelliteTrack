@@ -111,7 +111,7 @@ server.get('/defaults', async (req, res) => {
 });
 
 server.get('/getbyids', async (req, res) => {
-  const ids = req.query.ids;
+  const ids = Array.isArray(req.query.ids) ? req.query.ids : [req.query.ids];
   try {
     const querySats = (await updateTLE(ids, satellites))[0];
     satellites = querySats;
