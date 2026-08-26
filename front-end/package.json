@@ -12,6 +12,8 @@
   "dependencies": {
     "@react-hook/resize-observer": "^2.0.2",
     "axios": "^1.13.2",
+    "babel-jest": "^30.4.1",
+    "jest": "^30.4.2",
     "leaflet": "^1.9.4",
     "leaflet.antimeridian": "github:briannaAndCo/Leaflet.Antimeridian",
     "react": "^19.2.0",
