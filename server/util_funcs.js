@@ -76,6 +76,18 @@ export const updateTLE = async (
     throw new Error('TLEs argument must be an object');
   }
 
+  noradIDs.map((id) => {
+    if (
+      (typeof id !== 'string' && typeof id !== 'number') ||
+      typeof +id !== 'number' ||
+      Number.isNaN(+id)
+    ) {
+      throw new Error(
+        `all ids must be stringified numbers or of type number, ${id} is neither`,
+      );
+    }
+  });
+
   try {
     const nowInMs = new Date().valueOf();
     const TLEsCopy = { ...TLEs };
@@ -106,7 +118,6 @@ export const updateTLE = async (
 
     return [TLEsCopy, freshTLEs];
   } catch (e) {
-    console.log(`Error occured while updating TLE: ${e.message}`);
-    return [TLEs, null];
+    throw new Error('Error occured while updating TLE: ', e.message);
   }
 };
