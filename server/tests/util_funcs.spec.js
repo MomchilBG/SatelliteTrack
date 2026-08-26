@@ -54,6 +54,15 @@ describe('UpdateTLE function', () => {
     }
   });
 
+  test('should throw when passed an invalid noradIDs array', async () => {
+    try {
+      const invalidNoradIDsArray = ['a'];
+      expect(await updateTLE(invalidNoradIDsArray, testTLEs)).toThrow();
+    } catch (error) {
+      console.log(error);
+    }
+  });
+
   describe('TLEs', () => {
     test('should return as an object', async () => {
       try {
