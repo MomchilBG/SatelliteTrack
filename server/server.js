@@ -159,6 +159,10 @@ server.post('/add_sat', async (req, res) => {
   }
 });
 
+server.all(/(.*)/, (req, res) => {
+  res.status(404).send('<h1>Not found<h1>');
+});
+
 server.listen(port, () => {
   console.log(`server is listening on port ${port}...`);
 });
