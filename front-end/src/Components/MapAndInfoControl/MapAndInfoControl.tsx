@@ -32,7 +32,7 @@ const MapAndInfoControl = () => {
     if (TLEs.length === 0) {
       const getFetchPath =
         getSavedIDs() !== null
-          ? `getbyids?${getSavedIDs()
+          ? `get_by_ids?${getSavedIDs()
               ?.split(',')
               ?.map((id) => `ids=${id}`)
               .join('&')}`
