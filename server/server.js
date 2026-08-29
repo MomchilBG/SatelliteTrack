@@ -140,6 +140,9 @@ server.get('/get_by_ids', async (req, res) => {
 server.post('/add_sat', async (req, res) => {
   try {
     const noradID = +req.body.noradID;
+    if (typeof noradID !== 'number' || Number.isNaN(noradID)) {
+      throw new Error('invalid input, noradID must be a number!');
+    }
     const [updatedSats, updatedTLE] = await updateTLE([noradID], satellites);
     satellites = updatedSats;
     if (updatedTLE !== null && updatedTLE[0].success === false) {
@@ -160,7 +163,7 @@ server.post('/add_sat', async (req, res) => {
     res.status(200).json({
       success: false,
       satellites: null,
-      message: 'Post request failed',
+      message: `Post request failed: ${e.message}`,
     });
   }
 });
