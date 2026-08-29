@@ -34,11 +34,7 @@ server.get('/iss', async (req, res) => {
     });
   } catch (e) {
     console.log(`Error occuring during iss fetch: ${e.message}`);
-    res.status(200).json({
-      success: false,
-      satellites: null,
-      message: 'TLE fetching for the ISS failed',
-    });
+    res.status(500).send(`TLE fetching for the ISS failed ${e.message}`);
   }
 });
 
@@ -63,11 +59,7 @@ server.get('/hubble', async (req, res) => {
     });
   } catch (e) {
     console.log(`Error occuring during Hubble fetch: ${e.message}`);
-    res.status(200).json({
-      success: false,
-      satellites: null,
-      message: 'TLE fetching for the Hubble failed',
-    });
+    res.status(500).send(`TLE fetching for the Hubble failed ${e.message}`);
   }
 });
 
@@ -89,11 +81,7 @@ server.get('/css', async (req, res) => {
     });
   } catch (e) {
     console.log(`Error occuring during CSS fetch: ${e.message}`);
-    res.status(200).json({
-      success: false,
-      satellites: null,
-      message: 'TLE fetching for the CSS failed',
-    });
+    res.status(500).send(`TLE fetching for the CSS failed: ${e.message}`);
   }
 });
 
@@ -108,11 +96,7 @@ server.get('/defaults', async (req, res) => {
     });
   } catch (e) {
     console.log(`Error occured during defaults fetch: ${e.message}`);
-    res.status(200).json({
-      success: false,
-      satellites: null,
-      message: 'Default TLE fetching failed',
-    });
+    res.status(500).send(`Default TLE fetching failed: ${e.message}`);
   }
 });
 
@@ -120,10 +104,10 @@ server.get('/get_by_ids', async (req, res) => {
   const ids = Array.isArray(req.query.ids) ? req.query.ids : [req.query.ids];
   ids.map((id) => {
     if (typeof +id !== 'number' || Number.isNaN(+id)) {
-      throw new Error('ids must be numbers!');
+      res.status(400).send('ids must be numbers!');
     }
     if (+id % 1 > 0) {
-      throw new Error('ids must be whole numbers!');
+      res.status(400).send('ids must be whole numbers!');
     }
   });
   try {
@@ -137,11 +121,7 @@ server.get('/get_by_ids', async (req, res) => {
     });
   } catch (e) {
     console.log(`Error occured while updating by query: ${e.message}`);
-    res.status(200).json({
-      success: false,
-      satellites: null,
-      message: `Failed to fetch by query: ${e.message}`,
-    });
+    res.status(500).send(`Failed to fetch by query: ${e.message}`);
   }
 });
 
@@ -149,10 +129,10 @@ server.post('/add_sat', async (req, res) => {
   try {
     const noradID = +req.body.noradID;
     if (typeof noradID !== 'number' || Number.isNaN(noradID)) {
-      throw new Error('noradID must be a number!');
+      res.status(400).send('noradID must be a number!');
     }
     if (noradID % 1 > 0) {
-      throw new Error('noradID must be a whole number!');
+      res.status(400).send('noradID must be a whole number!');
     }
     const [updatedSats, updatedTLE] = await updateTLE([noradID], satellites);
     satellites = updatedSats;
@@ -171,11 +151,7 @@ server.post('/add_sat', async (req, res) => {
     }
   } catch (e) {
     console.log(`Post request failed: ${e.message}`);
-    res.status(200).json({
-      success: false,
-      satellites: null,
-      message: `Post request failed: ${e.message}`,
-    });
+    res.status(500).send(`Post request failed: ${e.message}`);
   }
 });
 
