@@ -122,6 +122,9 @@ server.get('/get_by_ids', async (req, res) => {
     if (typeof +id !== 'number' || Number.isNaN(+id)) {
       throw new Error('ids must be numbers!');
     }
+    if (+id % 1 > 0) {
+      throw new Error('ids must be whole numbers!');
+    }
   });
   try {
     const querySats = (await updateTLE(ids, satellites))[0];
@@ -146,7 +149,10 @@ server.post('/add_sat', async (req, res) => {
   try {
     const noradID = +req.body.noradID;
     if (typeof noradID !== 'number' || Number.isNaN(noradID)) {
-      throw new Error('invalid input, noradID must be a number!');
+      throw new Error('noradID must be a number!');
+    }
+    if (noradID % 1 > 0) {
+      throw new Error('noradID must be a whole number!');
     }
     const [updatedSats, updatedTLE] = await updateTLE([noradID], satellites);
     satellites = updatedSats;
