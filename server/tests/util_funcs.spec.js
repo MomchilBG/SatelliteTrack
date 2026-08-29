@@ -3,8 +3,10 @@ import { describe, test, expect, jest } from '@jest/globals';
 
 describe('UpdateTLE function', () => {
   const now = new Date();
-  const twoHoursAgo = now.setHours(now.getHours() - 2);
-  const yesterday = now.setDate(now.getDate() - 1);
+  const hourAndHalfAgo = new Date(
+    new Date().setHours(now.getHours() - 1, now.getMinutes() - 30),
+  );
+  const yesterday = new Date(new Date().setDate(now.getDate() - 1));
   const testTLEs = {
     1: {
       name: 'a',
@@ -18,7 +20,7 @@ describe('UpdateTLE function', () => {
       id: '00002',
       line1: 'abc',
       line2: 'def',
-      lastUpdated: twoHoursAgo,
+      lastUpdated: hourAndHalfAgo,
     },
     3: {
       name: 'c',
@@ -32,16 +34,16 @@ describe('UpdateTLE function', () => {
     ids.map((id) => ({ success: true, contents: id })),
   );
   const mockSplitTLEs = jest.fn((tles) => ({
-    [tles]: { id: tles, lastUpdated: now },
+    [tles[0].contents]: { id: tles[0].contents, lastUpdated: now },
   }));
-  const mockSetResponse = jest.fn((tles) => tles);
+  const mockSetResponse = jest.fn(() => undefined);
 
   test('should throw when passed a non-array noradIDs argument', async () => {
     try {
       const notArrayNoradIDs = '';
       expect(await updateTLE(notArrayNoradIDs, testTLEs)).toThrow();
     } catch (error) {
-      console.log(error);
+      expect(error.message).toBe('noradIDs argument must be an array');
     }
   });
 
@@ -50,7 +52,7 @@ describe('UpdateTLE function', () => {
       const notObjectTLEs = '';
       expect(await updateTLE([], notObjectTLEs)).toThrow();
     } catch (error) {
-      console.log(error);
+      expect(error.message).toBe('TLEs argument must be an object');
     }
   });
 
@@ -59,99 +61,91 @@ describe('UpdateTLE function', () => {
       const invalidNoradIDsArray = ['a'];
       expect(await updateTLE(invalidNoradIDsArray, testTLEs)).toThrow();
     } catch (error) {
-      console.log(error);
+      expect(error.message).toBe(
+        'all ids must be stringified numbers or of type number, a is neither',
+      );
     }
   });
 
   describe('TLEs', () => {
     test('should return as an object', async () => {
-      try {
-        const updatedTLEs = await updateTLE(
-          ['1', '002', 3],
-          testTLEs,
-          mockGetData,
-          mockSplitTLEs,
-          mockSetResponse,
-        )[0];
+      const res = await updateTLE(
+        ['1', '002', 3],
+        testTLEs,
+        mockGetData,
+        mockSplitTLEs,
+        mockSetResponse,
+      );
 
-        expect(updatedTLEs instanceof Object).toBe(true);
-      } catch (error) {
-        console.log(error);
-      }
+      expect(res[0] instanceof Object).toBe(true);
     });
 
     test('should return as the same object when no TLEs were updated', async () => {
-      try {
-        const updatedTLEs = await updateTLE(
-          [],
-          testTLEs,
-          mockGetData,
-          mockSplitTLEs,
-          mockSetResponse,
-        )[0];
+      const res = await updateTLE(
+        [],
+        testTLEs,
+        mockGetData,
+        mockSplitTLEs,
+        mockSetResponse,
+      );
 
-        expect(updatedTLEs).toBe(testTLEs);
-      } catch (error) {
-        console.log(error);
-      }
+      expect(res[0]).toEqual(testTLEs);
     });
 
     test('should update when they were last updated more than 2 hours ago', async () => {
-      try {
-        const updatedTLEs = await updateTLE(
-          ['1', '002', 3],
-          testTLEs,
-          mockGetData,
-          mockSplitTLEs,
-          mockSetResponse,
-        )[0];
+      const res = await updateTLE(
+        ['1', '002', 3],
+        testTLEs,
+        mockGetData,
+        mockSplitTLEs,
+        mockSetResponse,
+      );
 
-        expect(
-          ...[updatedTLEs[1].lastUpdated, updatedTLEs[2].lastUpdated],
-          updatedTLEs[3].lastUpdated,
-        ).toBe(...[now, twoHoursAgo, now]);
-      } catch (error) {
-        console.log(error);
-      }
+      expect([
+        res[0][1].lastUpdated,
+        res[0][2].lastUpdated,
+        res[0][3].lastUpdated,
+      ]).toEqual([now, hourAndHalfAgo, now]);
     });
   });
 
   describe('fetched data', () => {
     test('should be returned in an array when TLEs were updated', async () => {
-      try {
-        const fetchedTLEs = await updateTLE(
-          ['1', '002', 3],
-          testTLEs,
-          mockGetData,
-          mockSplitTLEs,
-          mockSetResponse,
-        )[1];
+      const res = await updateTLE(
+        ['1', '002', 3],
+        testTLEs,
+        mockGetData,
+        mockSplitTLEs,
+        mockSetResponse,
+      );
 
-        expect(fetchedTLEs instanceof Array).toBe(true);
-        expect(fetchedTLEs).toBe(
-          mockSplitTLEs.mock.results
-            .slice(-fetchedTLEs.length)
-            .map((result) => result.value),
-        );
-      } catch (error) {
-        console.log(error);
-      }
+      expect(res[1] instanceof Array).toBe(true);
+    });
+
+    test('should must consist of the getData returns', async () => {
+      const res = await updateTLE(
+        ['1', '002', 3],
+        testTLEs,
+        mockGetData,
+        mockSplitTLEs,
+        mockSetResponse,
+      );
+
+      expect(res[1]).toEqual(
+        mockGetData.mock.results[mockGetData.mock.results.length - 1].value,
+      );
     });
 
     test('should be returned as null when no TLEs were updated', async () => {
-      try {
-        const fetchedTLEs = await updateTLE(
-          [],
-          testTLEs,
-          mockGetData,
-          mockSplitTLEs,
-          mockSetResponse,
-        )[1];
+      const res = await updateTLE(
+        [],
+        testTLEs,
+        mockGetData,
+        mockSplitTLEs,
+        mockSetResponse,
+      );
 
-        expect(fetchedTLEs).toBe(null);
-      } catch (error) {
-        console.log(error);
-      }
+      expect(res[1]).toBe(null);
     });
   });
 });
