@@ -118,6 +118,11 @@ server.get('/defaults', async (req, res) => {
 
 server.get('/get_by_ids', async (req, res) => {
   const ids = Array.isArray(req.query.ids) ? req.query.ids : [req.query.ids];
+  ids.map((id) => {
+    if (typeof +id !== 'number' || Number.isNaN(+id)) {
+      throw new Error('ids must be numbers!');
+    }
+  });
   try {
     const querySats = (await updateTLE(ids, satellites))[0];
     satellites = querySats;
@@ -132,7 +137,7 @@ server.get('/get_by_ids', async (req, res) => {
     res.status(200).json({
       success: false,
       satellites: null,
-      message: 'Failed to fetch by query',
+      message: `Failed to fetch by query: ${e.message}`,
     });
   }
 });
