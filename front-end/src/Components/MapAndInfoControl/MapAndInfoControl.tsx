@@ -74,7 +74,7 @@ const MapAndInfoControl = () => {
         });
     }
     const interval = setInterval(() => {
-      fetchData(`getbyids?${TLEs.map((tle) => `ids=${tle.id}`).join('&')}`)
+      fetchData(`get_by_ids?${TLEs.map((tle) => `ids=${tle.id}`).join('&')}`)
         .then((response) => {
           if (response.satellites) {
             setTLEs(
@@ -97,7 +97,7 @@ const MapAndInfoControl = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      if (TLEs[0].loaded) {
+      if (TLEs[0] && TLEs[0].loaded) {
         setLocations(
           TLEs.map((TLE) => ({
             location: convertTLEtoCoords(TLE.line1, TLE.line2),
