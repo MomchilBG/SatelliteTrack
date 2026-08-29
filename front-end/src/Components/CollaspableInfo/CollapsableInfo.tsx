@@ -8,34 +8,24 @@ import Button from '../Button/Button.tsx';
 
 import './CollapsableInfo.css';
 
-const CollapsableInfo = ({
-  colorsKey,
-  title,
-  satellite,
-}: {
-  colorsKey: string;
-  title: string;
-  satellite: SatelliteInfo;
-}) => {
+const CollapsableInfo = ({ satellite }: { satellite: SatelliteInfo }) => {
   const [display, setDisplay] = useState<'none' | 'block'>('none');
 
   return (
     <>
       <Button
-        key={`collapsable-info-${title}`}
+        key={`collapsable-info-${satellite.name}`}
         onClick={() => setDisplay(display === 'none' ? 'block' : 'none')}
         onClickArgs={[]}
         id=""
         disabled={false}
         className="collapsable-info-toggle"
         style={{
-          backgroundColor: `rgba(${colors[colorsKey as keyof typeof colors]}, 0.45)`,
+          backgroundColor: `rgba(${colors[satellite.key as keyof typeof colors]}, 0.45)`,
         }}
-        content={title}
+        content={satellite.name}
       />
-      <TrackingInfoPanel
-        {...{ satellite, colorsKey: colorsKey, display: display }}
-      />
+      <TrackingInfoPanel {...{ satellite, display: display }} />
     </>
   );
 };

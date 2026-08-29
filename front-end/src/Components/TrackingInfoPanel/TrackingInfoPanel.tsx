@@ -4,19 +4,17 @@ import './TrackingInfoPanel.css';
 
 const TrackingInfoPanel = ({
   satellite,
-  colorsKey,
   display,
 }: {
   satellite: SatelliteInfo;
-  colorsKey: string;
   display: string;
 }) => {
   return (
     <div
-      key={`tracking-info-${colorsKey}`}
+      key={`tracking-info-${satellite.key}`}
       className="tracking-info"
       style={{
-        backgroundColor: `rgba(${colors[colorsKey as keyof typeof colors]}, 0.35)`,
+        backgroundColor: `rgba(${colors[satellite.key as keyof typeof colors]}, 0.35)`,
         display: display,
       }}
     >
