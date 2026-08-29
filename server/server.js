@@ -10,6 +10,12 @@ server.use(express.json());
 
 let satellites = {};
 
+server.get('/', (req, res) => {
+  res
+    .status(200)
+    .send('paths: /iss /hubble /css /defaults /get_by_ids:ids /add_sat');
+});
+
 server.get('/iss', async (req, res) => {
   try {
     const [sats, ISSTLE] = await updateTLE([DEF_NORAD_IDS.ISS], satellites);
@@ -110,7 +116,7 @@ server.get('/defaults', async (req, res) => {
   }
 });
 
-server.get('/getbyids', async (req, res) => {
+server.get('/get_by_ids', async (req, res) => {
   const ids = Array.isArray(req.query.ids) ? req.query.ids : [req.query.ids];
   try {
     const querySats = (await updateTLE(ids, satellites))[0];
