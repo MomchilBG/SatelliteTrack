@@ -101,16 +101,25 @@ server.get('/defaults', async (req, res) => {
 });
 
 server.get('/get_by_ids', async (req, res) => {
-  const ids = Array.isArray(req.query.ids) ? req.query.ids : [req.query.ids];
-  ids.map((id) => {
-    if (typeof +id !== 'number' || Number.isNaN(+id)) {
-      res.status(400).send('ids must be numbers!');
-    }
-    if (+id % 1 > 0) {
-      res.status(400).send('ids must be whole numbers!');
-    }
-  });
   try {
+    const ids = Array.isArray(req.query.ids) ? req.query.ids : [req.query.ids];
+    let error = false;
+    ids.map((id) => {
+      if (error) return;
+      if (typeof +id !== 'number' || Number.isNaN(+id)) {
+        res.status(400).send('ids must be numbers!');
+        error = true;
+      }
+      if (+id % 1 > 0) {
+        res.status(400).send('ids must be whole numbers!');
+        error = true;
+      }
+      if (+id < 0) {
+        res.status(400).send('ids must be positive numbers!');
+        error = true;
+      }
+    });
+    if (error) return;
     const querySats = (await updateTLE(ids, satellites))[0];
     satellites = querySats;
     const requestedTLEs = ids.map((noradID) => satellites[+noradID]);
@@ -130,24 +139,26 @@ server.post('/add_sat', async (req, res) => {
     const noradID = +req.body.noradID;
     if (typeof noradID !== 'number' || Number.isNaN(noradID)) {
       res.status(400).send('noradID must be a number!');
-    }
-    if (noradID % 1 > 0) {
+    } else if (noradID % 1 > 0) {
       res.status(400).send('noradID must be a whole number!');
-    }
-    const [updatedSats, updatedTLE] = await updateTLE([noradID], satellites);
-    satellites = updatedSats;
-    if (updatedTLE !== null && updatedTLE[0].success === false) {
-      res.status(200).json({
-        success: false,
-        satellites: null,
-        message: updatedTLE[0].contents,
-      });
+    } else if (noradID <= 0) {
+      res.status(400).send('noradID must be a positive number!');
     } else {
-      res.status(200).json({
-        success: true,
-        satellites: [satellites[noradID]],
-        message: '',
-      });
+      const [updatedSats, updatedTLE] = await updateTLE([noradID], satellites);
+      satellites = updatedSats;
+      if (updatedTLE !== null && updatedTLE[0].success === false) {
+        res.status(200).json({
+          success: false,
+          satellites: null,
+          message: updatedTLE[0].contents,
+        });
+      } else {
+        res.status(200).json({
+          success: true,
+          satellites: [satellites[noradID]],
+          message: '',
+        });
+      }
     }
   } catch (e) {
     console.log(`Post request failed: ${e.message}`);
