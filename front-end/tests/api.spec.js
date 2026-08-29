@@ -9,7 +9,7 @@ describe('fetchData', () => {
       const notAString = [];
       expect(await fetchData(notAString)).toThrow();
     } catch (error) {
-      console.log(error);
+      expect(error.message).toBe('path argument must be a string');
     }
   });
 });
@@ -20,14 +20,16 @@ describe('postSatellite', () => {
       const notAString = [];
       expect(await postSatellite(notAString)).toThrow(notAString);
     } catch (error) {
-      console.log(error);
+      expect(error.message).toBe('noradID argument must be a string');
     }
   });
 });
 
 describe('Server', () => {
   const testResponse = async (path) =>
-    await fetch(`http://${serverPort}${path}`).then((response) => response);
+    await fetch(`http://localhost:${serverPort}${path}`).then(
+      (response) => response,
+    );
   test('should be online', async () => {
     try {
       expect((await testResponse('/')).status).toBe(200);
