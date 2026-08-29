@@ -1,9 +1,13 @@
 import axios from 'axios';
 import type { APIResponse } from '../Types/satellite.ts';
 
-export const fetchData = (satellite: string): Promise<APIResponse> =>
-  axios
-    .get<APIResponse>(`http://localhost:5001/${satellite}`, {
+export const fetchData = async (path: string): Promise<APIResponse> => {
+  if (typeof path !== 'string') {
+    throw new Error('path argument must be a string');
+  }
+
+  return await axios
+    .get<APIResponse>(`http://localhost:5001/${path}`, {
       responseType: 'json',
     })
     .then((response) =>
@@ -19,3 +23,4 @@ export const fetchData = (satellite: string): Promise<APIResponse> =>
         message: 'Failed to fetch TLEs',
       };
     });
+};
