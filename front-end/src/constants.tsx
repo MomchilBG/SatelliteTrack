@@ -14,6 +14,8 @@ export const failedFetchPlaceholder: Satellite[] = [
   },
 ];
 
+export const serverPort = 5001;
+
 export const periodInSec = 15;
 
 export const limitOfSatellites = 8;
