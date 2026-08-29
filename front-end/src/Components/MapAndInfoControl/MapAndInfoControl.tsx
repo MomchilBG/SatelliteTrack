@@ -224,8 +224,6 @@ const MapAndInfoControl = () => {
                   className={`custom-button ${satellite.visible ? 'visible' : 'not-visible'}`}
                 />
                 <CollapsableInfo
-                  colorsKey={satellite.key}
-                  title={satellite.name}
                   satellite={{ ...satellite, ...locations[i] }}
                 />
                 {i >= Object.values(defaultNoradIDs).length && (
