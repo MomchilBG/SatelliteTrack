@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { serverPort } from '../constants.tsx';
 import type { APIResponse } from '../Types/satellite.ts';
 
 export const fetchData = async (path: string): Promise<APIResponse> => {
@@ -7,7 +8,7 @@ export const fetchData = async (path: string): Promise<APIResponse> => {
   }
 
   return await axios
-    .get<APIResponse>(`http://localhost:5001/${path}`, {
+    .get<APIResponse>(`http://localhost:${serverPort}/${path}`, {
       responseType: 'json',
     })
     .then((response) =>

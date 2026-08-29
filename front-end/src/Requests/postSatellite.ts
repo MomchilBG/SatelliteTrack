@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { serverPort } from '../constants.tsx';
 import type { APIResponse } from '../Types/satellite.ts';
 
 export const postSatellite = async (noradID: string): Promise<APIResponse> => {
@@ -7,7 +8,9 @@ export const postSatellite = async (noradID: string): Promise<APIResponse> => {
   }
 
   return await axios
-    .post<APIResponse>(`http://localhost:5001/add_sat`, { noradID: noradID })
+    .post<APIResponse>(`http://localhost:${serverPort}/add_sat`, {
+      noradID: noradID,
+    })
     .then((response) => response.data)
     .catch((error) => {
       console.log(`Error posting satellite: ${error}`);
