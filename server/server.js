@@ -91,7 +91,7 @@ server.get('/defaults', async (req, res) => {
     satellites = sats;
     res.status(200).json({
       success: true,
-      satellites: Object.values(DEF_NORAD_IDS).map((id) => satellites[id]),
+      satellites: Object.values(DEF_NORAD_IDS).filter((id) => satellites[id]),
       message: '',
     });
   } catch (e) {
@@ -122,7 +122,7 @@ server.get('/get_by_ids', async (req, res) => {
     if (error) return;
     const querySats = (await updateTLE(ids, satellites))[0];
     satellites = querySats;
-    const requestedTLEs = ids.map((noradID) => satellites[+noradID]);
+    const requestedTLEs = ids.filter((noradID) => satellites[+noradID]);
     res.status(200).json({
       success: true,
       satellites: requestedTLEs,
