@@ -39,23 +39,23 @@
   border: none;
   position: relative;
   border-right: 1px solid gray;
+  cursor: default;
+  &:not(.disable):hover:after {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    cursor: pointer;
+    background-color: #ffffff3c;
+  }
 }
 
 .menu-nav-button:last-child {
   border-right: none;
   border-left: 1px solid gray;
-}
-
-.menu-nav-button:hover:after {
-  content: '';
-  display: block;
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-  cursor: pointer;
-  background-color: #ffffff3c;
 }
 
 #data {
@@ -69,6 +69,11 @@
   max-height: 64vh;
   overflow-y: scroll;
   overscroll-behavior-y: none;
+}
+
+#data > p {
+  font-size: 18px;
+  user-select: none;
 }
 
 .satellite-data-panel-item {

@@ -271,7 +271,36 @@ const MapAndInfoControl = () => {
       </div>
     </div>
   ) : (
-    <p>Loading...</p>
+    <div id="app">
+      <div id="menu">
+        <div id="menu-nav">
+          <Button
+            onClickArgs={[]}
+            content="Add Satellite"
+            onClick={() => setMenu('addSat')}
+            className="menu-nav-button disable"
+            style={{}}
+            disabled={true}
+            id=""
+          />
+          <Button
+            onClickArgs={[]}
+            content="View Info"
+            onClick={() => setMenu('info')}
+            className="menu-nav-button disable"
+            style={{}}
+            disabled={true}
+            id=""
+          />
+        </div>
+        <div id="data">
+          <p>Loading...</p>
+        </div>
+      </div>
+      <div id="map-info">
+        <LeafletMap satellites={[]} />
+      </div>
+    </div>
   );
 };
 
