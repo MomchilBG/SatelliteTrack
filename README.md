@@ -57,6 +57,7 @@ front-end/
 │   ├── types/          # Typescript types used accross the front-end part of the app
 │   ├── util_funcs/     # Functions used for calculations regarding position and path of satellites
 ├── tests/              # Tests for the front-end part of the app
+
 server/
 ├── tests/              # Tests for the server part of the app
 ```
