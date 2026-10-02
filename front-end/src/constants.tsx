@@ -391,9 +391,9 @@ export const aboutProject: AboutInfo = Object.freeze({
       >
         Celestrak
       </a>{' '}
-      API and they're refetched every two hours in order to keep them valid.
-      From that local server, they're passed on to the front end, where they're
-      processed with the help of the{' '}
+      API, after which they get stored. They are refetched if they get called
+      and they are more than two hours old. From that local server, they're
+      passed on to the front end, where they're processed with the help of the{' '}
       <a
         href="https://www.npmjs.com/package/satellite.js/v/1.3.0"
         target="_blank"
@@ -411,14 +411,18 @@ export const aboutProject: AboutInfo = Object.freeze({
       with{' '}
       <a href="https://vite.dev/" target="_blank" rel="noopener noreferrer">
         vite
-      </a>{' '}
-      and{' '}
+      </a>
+      ,{' '}
       <a
         href="https://www.typescriptlang.org/"
         target="_blank"
         rel="noopener noreferrer"
       >
         Typescript
+      </a>{' '}
+      and{' '}
+      <a href="https://vitest.dev/" target="_blank" rel="noopener noreferrer">
+        vitest
       </a>
       .
     </>
