@@ -9,10 +9,10 @@ import {
 import type { Satellite, Location } from '../../Types/satellite.ts';
 import { defaultNoradIDs, limitOfSatellites } from '../../constants.tsx';
 
-import LeafletMap from '../LeafletMap/LeafletMap.tsx';
-import CollapsableInfo from '../CollaspableInfo/CollapsableInfo.tsx';
-import Button from '../Button/Button.tsx';
-import AddSatellitePanel from '../AddSatellitePanel/AddSatellitePanel.tsx';
+import LeafletMap from '../../Components/LeafletMap/LeafletMap.tsx';
+import CollapsableInfo from '../../Components/CollaspableInfo/CollapsableInfo.tsx';
+import Button from '../../Components/Button/Button.tsx';
+import AddSatellitePanel from '../../Components/AddSatellitePanel/AddSatellitePanel.tsx';
 
 import './MapAndInfoControl.css';
 

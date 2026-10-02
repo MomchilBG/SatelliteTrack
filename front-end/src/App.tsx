@@ -1,4 +1,4 @@
-import MapAndInfoControl from './Components/MapAndInfoControl/MapAndInfoControl.tsx';
+import MapAndInfoControl from './pages/MapAndInfoControl/MapAndInfoControl.tsx';
 import AboutPanel from './Components/AboutPanel/AboutPanel.tsx';
 
 import './App.css';
